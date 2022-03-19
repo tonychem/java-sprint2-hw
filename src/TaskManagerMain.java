@@ -1,5 +1,9 @@
-import manager.*;
-import tasks.*;
+import manager.HistoryManager;
+import manager.InMemoryTaskManager;
+import tasks.Epic;
+import tasks.Status;
+import tasks.Subtask;
+import tasks.Task;
 
 import java.util.ArrayList;
 
@@ -7,53 +11,50 @@ public class TaskManagerMain {
     public static void main(String[] args) {
         //Блок инициализации менеджера и задач
         InMemoryTaskManager taskManager = new InMemoryTaskManager();
-        TaskManager newMgr = Managers.getDefault();
+
         Task task1 = new Task("Задача №1", "");
         Task task2 = new Task("Задача №2", "", Status.DONE);
-        Task task3 = new Task("Задача №3", "");
-        Task task4 = new Task("Задача №4", "");
-        Task task5 = new Task("Задача №5", "");
-        Task task6 = new Task("Задача №6", "");
-        Task task7 = new Task("Задача №7", "");
-        Task[] taskArray = {task1, task2, task3, task4, task5, task6, task7};
 
         Subtask sub1 = new Subtask("Подзадача №1", "");
-        Subtask sub2 = new Subtask("Подзадача №1", "", Status.IN_PROGRESS);
-        Subtask sub3 = new Subtask("Подзадача №1", "");
+        Subtask sub2 = new Subtask("Подзадача №2", "", Status.IN_PROGRESS);
+        Subtask sub3 = new Subtask("Подзадача №3", "");
 
-        ArrayList<Subtask> toEpic1 = new ArrayList<>();
-        toEpic1.add(sub1);
-        toEpic1.add(sub2);
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(sub1);
+        subtasks.add(sub2);
+        subtasks.add(sub3);
 
-        ArrayList<Subtask> toEpic2 = new ArrayList<>();
-        toEpic2.add(sub3);
-
-        Epic epic1 = new Epic("Эпик1", "", toEpic1);
-        Epic epic2 = new Epic("Эпик2", "", toEpic2);
-        Epic epic3 = new Epic("Эпик3", "", new ArrayList<>());
-        Epic epic4 = new Epic("Эпик4", "", new ArrayList<>());
-        Epic[] epicArray = {epic1, epic2, epic3, epic4};
+        Epic epic1 = new Epic("Эпик1", "3 подзадачи", subtasks);
+        Epic epic2 = new Epic("Эпик2", "пустой", new ArrayList<>());
 
         //Сохранение задач в менеджерах
-        for (int i = 0; i < taskArray.length; i++) {
-            taskManager.saveTask(taskArray[i]);
-            newMgr.saveTask(taskArray[i]);
-        }
-        for (int i = 0; i < epicArray.length; i++) {
-            taskManager.saveEpic(epicArray[i]);
-            newMgr.saveEpic(epicArray[i]);
-        }
-
-        System.out.println("Manager state before: " + taskManager);
-        //тесты
-        for (int i = 1; i < 16; i++) {
-            taskManager.getTaskByID(i);
-            newMgr.getTaskByID(i);
-        }
+        taskManager.saveTask(task1);
+        taskManager.saveTask(task2);
+        taskManager.saveEpic(epic1);
+        taskManager.saveEpic(epic2);
 
         HistoryManager historyManager = taskManager.getHistoryManager();
-        System.out.println(historyManager.getHistory());
+        System.out.println(taskManager);
 
+        //вызов задач в произвольной последовательности с повторами [3 -> 1 -> 3 -> 7 -> 2 -> 1 -> 7 -> 6]
+        taskManager.getTaskByID(3);
+        taskManager.getTaskByID(1);
+        taskManager.getTaskByID(3);
+        taskManager.getTaskByID(7);
+        taskManager.getTaskByID(2);
+        taskManager.getTaskByID(1);
+        taskManager.getTaskByID(7);
+        taskManager.getTaskByID(6);
 
+        //historyManager : [ 3 -> 2 -> 1 -> 7 -> 6 ]
+        System.out.println("Вызов задач в произвольной последовательности с повторами: \n" + historyManager.getHistory());
+
+        //удаление задачи посередине (id = 1)
+        historyManager.remove(1);
+        System.out.println("Удаление задачи с id = 1: \n" + historyManager.getHistory());
+
+        //удаление эпика с 3-мя подзадачами (id = 6)
+        historyManager.remove(6);
+        System.out.println("Удаление эпика с 3-мя подзадачами (id = 6): \n" + historyManager.getHistory());
     }
 }

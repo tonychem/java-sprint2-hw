@@ -4,8 +4,8 @@ import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Long, Task> taskMap;
@@ -79,10 +79,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void saveEpic(Epic epic) {
         for (Subtask sub : epic.getMySubtasks()) {
-            sub.setId(assignID);
-            sub.setMyEpicReference(epic);
-            subtaskMap.put(assignID, sub);
-            assignID++;
+            if (!subtaskMap.containsValue(sub)) {
+                sub.setId(assignID);
+                sub.setMyEpicReference(epic);
+                subtaskMap.put(assignID, sub);
+                assignID++;
+            }
         }
         epic.setId(assignID);
         epicMap.put(assignID, epic.update());
@@ -91,10 +93,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void saveSubtask(Subtask sub) {
-        sub.setId(assignID);
-        subtaskMap.put(assignID, sub);
-        assignID++;
-        updateEpic(sub.getMyEpicReference().update());
+        if (!subtaskMap.containsValue(sub)) {
+            sub.setId(assignID);
+            subtaskMap.put(assignID, sub);
+            assignID++;
+            updateEpic(sub.getMyEpicReference().update());
+        }
     }
 
     @Override

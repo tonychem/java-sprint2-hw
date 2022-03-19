@@ -2,7 +2,10 @@ package manager;
 
 import tasks.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private static final int MAX_HISTORY_VIEW = 10;
@@ -18,6 +21,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public void add(Task task) {
         if (task != null) {
+            if (history.map.containsKey(task.getId())) {
+                history.removeNode(history.map.get(task.getId()));
+            }
             if (history.size() == MAX_HISTORY_VIEW) {
                 remove(history.head.data.getId());
             }
@@ -33,8 +39,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     class TaskLinkedList<T extends Task> {
-         //TODO add implementation of linked list
-        //TODO linkedlist works fine but why?
         private Node<T> head;
         private Node<T> tail;
         private Map<Long, Node<T>> map;
@@ -65,12 +69,16 @@ public class InMemoryHistoryManager implements HistoryManager {
             return size;
         }
 
+        //Метод перезаписывает ссылки внутри предыдущего и следующего узлов друг на друга
         public void removeNode(Node<T> n) {
             if (n != null) {
                 Node<T> previousNode = n.previous;
                 Node<T> nextNode = n.next;
 
-                if(previousNode == null) {
+                if (previousNode == null & nextNode == null) {
+                    head = null;
+                    tail = null;
+                } else if (previousNode == null) {
                     head = nextNode;
                     nextNode.previous = null;
                 } else if (nextNode == null) {
@@ -84,12 +92,12 @@ public class InMemoryHistoryManager implements HistoryManager {
             }
         }
 
-
         public ArrayList<Task> getTasks() {
-            Node<?> iterator = head;
+            //Итератор ссылается на текущий узел и собирает data в ArrayList
+            Node<T> iterator = head;
             ArrayList<Task> historyList = new ArrayList<>();
 
-            while(iterator != null) {
+            while (iterator != null) {
                 historyList.add(iterator.data);
                 iterator = iterator.next;
             }
@@ -100,14 +108,13 @@ public class InMemoryHistoryManager implements HistoryManager {
 }
 
 class Node<T extends Task> {
-    Node previous;
-    Node next;
+    Node<T> previous;
+    Node<T> next;
     T data;
 
-    public Node(Node previous, T data, Node next) {
+    public Node(Node<T> previous, T data, Node<T> next) {
         this.previous = previous;
         this.next = next;
         this.data = data;
     }
-    //TODO check if it is enough
 }
