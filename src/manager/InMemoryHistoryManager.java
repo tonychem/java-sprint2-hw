@@ -35,15 +35,15 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     //удаляет запись в HashMap, перезатирает ссылки в двусвязном списке
     public void remove(long id) {
-        Node<Task> nodeToRemove = history.map.remove(id);
+        Node nodeToRemove = history.map.remove(id);
         history.removeNode(nodeToRemove);
         history.size--;
     }
 
     class TaskLinkedList<T extends Task> {
-        private Node<T> head;
-        private Node<T> tail;
-        private Map<Long, Node<T>> map;
+        private Node head;
+        private Node tail;
+        private Map<Long, Node> map;
         private int size;
 
         public TaskLinkedList() {
@@ -54,8 +54,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         public void linkLast(T task) {
-            Node<T> oldTail = tail;
-            Node<T> newTail = new Node(oldTail, task, null);
+            Node oldTail = tail;
+            Node newTail = new Node(oldTail, task, null);
             map.put(task.getId(), newTail);
 
             if (oldTail == null) {
@@ -72,10 +72,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         //Метод перезаписывает ссылки внутри предыдущего и следующего узлов друг на друга
-        public void removeNode(Node<T> n) {
-            if (n != null) {
-                Node<T> previousNode = n.previous;
-                Node<T> nextNode = n.next;
+        public void removeNode(Node node) {
+            if (node != null) {
+                Node previousNode = node.previous;
+                Node nextNode = node.next;
 
                 if (previousNode == null & nextNode == null) {
                     head = null;
@@ -96,7 +96,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         public ArrayList<Task> getTasks() {
             //Итератор ссылается на текущий узел и собирает data в ArrayList
-            Node<T> iterator = head;
+            Node iterator = head;
             ArrayList<Task> historyList = new ArrayList<>();
 
             while (iterator != null) {
@@ -109,12 +109,12 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 }
 
-class Node<T extends Task> {
-    Node<T> previous;
-    Node<T> next;
-    T data;
+class Node {
+    Node previous;
+    Node next;
+    Task data;
 
-    public Node(Node<T> previous, T data, Node<T> next) {
+    public Node(Node previous, Task data, Node next) {
         this.previous = previous;
         this.next = next;
         this.data = data;
