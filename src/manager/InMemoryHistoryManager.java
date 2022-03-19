@@ -21,6 +21,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public void add(Task task) {
         if (task != null) {
+            //если поставляется существующий в HashMap объект, то он только удаляется из двусвязного списка
             if (history.map.containsKey(task.getId())) {
                 history.removeNode(history.map.get(task.getId()));
             }
@@ -32,6 +33,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
+    //удаляет запись в HashMap, перезатирает ссылки в двусвязном списке
     public void remove(long id) {
         Node<Task> nodeToRemove = history.map.remove(id);
         history.removeNode(nodeToRemove);
