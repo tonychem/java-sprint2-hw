@@ -35,7 +35,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         fileBackedTasksManager.getTaskByID(4);
         System.out.printf("*запись TaskManager в файл %s завершена*%n", outputFilePath);
 
-        FileBackedTasksManager readFromFile = FileBackedTasksManager.loadFromFile(inputFilePath);
+        FileBackedTasksManager readFromFile = FileBackedTasksManager.loadFromFile(new File(inputFilePath));
         System.out.printf("Восстановленный из файла TaskManager: %n%s%nИ его история:%n%s", readFromFile,
                 readFromFile.getHistoryManager().getHistory());
     }
@@ -127,14 +127,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return listToReturn;
     }
 
-    static FileBackedTasksManager loadFromFile(String pathToFile) {
-        FileBackedTasksManager backUp = new FileBackedTasksManager(pathToFile);
+    static FileBackedTasksManager loadFromFile(File file) {
+        FileBackedTasksManager backUp = new FileBackedTasksManager(file.getPath());
         List<Task> tasks = new ArrayList<>();
         List<Epic> epics = new ArrayList<>();
         List<Subtask> subtasks = new ArrayList<>();
         List<Long> history = null;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             br.readLine(); //пропускаем header
 
             while (br.ready()) {
@@ -272,7 +272,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         super.removeEpic(ID);
         save();
     }
-    
+
     @Override
     public void assignSubtaskToEpic(long epicID, long subtaskID) {
         super.assignSubtaskToEpic(epicID, subtaskID);
