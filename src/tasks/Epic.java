@@ -5,6 +5,8 @@ import java.util.Objects;
 
 public class Epic extends Task {
 
+    private static TaskType type = TaskType.EPIC;
+
     private ArrayList<Subtask> mySubtasks;
 
     public Epic(String title, String description, ArrayList<Subtask> subtasks) {
@@ -45,6 +47,10 @@ public class Epic extends Task {
                 }
             }
         }
+    }
+
+    public TaskType getType() {
+        return type;
     }
 
     //Метод возвращает новый экземпляр с обновленным статусом, расчитанным по статусам подзадач

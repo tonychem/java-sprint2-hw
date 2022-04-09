@@ -6,6 +6,8 @@ public class Subtask extends Task {
 
     private Epic myEpicReference;
 
+    private static TaskType type = TaskType.SUBTASK;
+
     public Subtask(String title, String description) {
         super(title, description);
     }
@@ -27,6 +29,10 @@ public class Subtask extends Task {
         subtask.setId(this.getId());
         subtask.setMyEpicReference(this.getMyEpicReference());
         return subtask;
+    }
+
+    public TaskType getType() {
+        return type;
     }
 
     @Override

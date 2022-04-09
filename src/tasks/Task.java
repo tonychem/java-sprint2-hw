@@ -3,6 +3,7 @@ package tasks;
 import java.util.Objects;
 
 public class Task {
+    private static TaskType type = TaskType.TASK;
     private String title;
     private String description;
     private long id;
@@ -41,6 +42,10 @@ public class Task {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public TaskType getType() {
+        return type;
     }
 
     public Status getStatus() {

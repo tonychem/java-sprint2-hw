@@ -1,0 +1,6 @@
+id,type,name,status,description,epic
+1,SUBTASK,Подзадание 1,NEW,Купить водки,2
+1,SUBTASK,Подзадание 1,NEW,Купить водки,2
+2,EPIC,Эпик 1,NEW,Сходить в магаз,
+3,TASK,Задание 1,NEW,Купить хлеба,
+1,2,3
