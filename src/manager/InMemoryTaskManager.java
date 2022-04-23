@@ -167,18 +167,6 @@ public class InMemoryTaskManager implements TaskManager {
         } else return null;
     }
 
-    public void assignSubtaskToEpic(long epicID, long subtaskID) {
-        Epic thisEpic = epicMap.get(epicID);
-        Subtask thisSubtask = subtaskMap.get(subtaskID);
-
-        if (thisEpic == null || thisSubtask == null || thisSubtask.getId() == 0) {
-            return;
-        } else {
-            thisSubtask.setMyEpicReference(thisEpic);
-            thisEpic.putSubtask(thisSubtask);
-        }
-    }
-
     @Override
     public String toString() {
         String out = "Manager\n";

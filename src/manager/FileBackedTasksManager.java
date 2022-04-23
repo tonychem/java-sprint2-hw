@@ -273,10 +273,4 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
-    @Override
-    public void assignSubtaskToEpic(long epicID, long subtaskID) {
-        super.assignSubtaskToEpic(epicID, subtaskID);
-        save();
-    }
-
 }
