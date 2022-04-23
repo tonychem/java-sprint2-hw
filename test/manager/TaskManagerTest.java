@@ -42,7 +42,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         manager.saveEpic(mixedNewAndInProgress);
         manager.saveEpic(empty);
 
-        for(Epic e : manager.getAllEpics()) {
+        for (Epic e : manager.getAllEpics()) {
             Status expected = e.getStatus();
             String epicTitle = e.getTitle();
 
@@ -60,5 +60,24 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 Assertions.assertEquals(Status.NEW, expected);
             }
         }
+    }
+
+    @Test
+    public void shouldSubtasksHaveEpic() {
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(new Subtask("1", "", Status.IN_PROGRESS));
+        subtasks.add(new Subtask("2", ""));
+
+        Epic epic = new Epic("epic", "", subtasks);
+        Subtask withoutEpic = new Subtask("w/o Epic", "");
+
+        manager.saveEpic(epic);
+
+        for (Subtask subtask : manager.getAllSubtasks()) {
+            Assertions.assertNotNull(subtask.getMyEpicReference());
+        }
+
+        //нельзя сохранять подзадания, которые не были проиндексированы в TaskManager-e
+        Assertions.assertThrows(IllegalArgumentException.class, () -> manager.saveSubtask(withoutEpic));
     }
 }

@@ -93,6 +93,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void saveSubtask(Subtask sub) {
+        if (sub.getMyEpicReference() == null) {
+            throw new IllegalArgumentException("Нельзя передавать подзадачу без эпика");
+        }
         if (!subtaskMap.containsValue(sub)) {
             sub.setId(assignID);
             subtaskMap.put(assignID, sub);
