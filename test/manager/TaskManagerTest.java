@@ -3,6 +3,7 @@ package manager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import tasks.Epic;
 import tasks.Status;
@@ -125,7 +126,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Epic epicWithSubtasks = new Epic("epic1", "", subtasks);
         Epic epicWithOutSubtasks = new Epic("epicEMPTY", "", new ArrayList<>());
 
-        Assertions.assertAll("Удаление списка заданий из пустого менеджера:", () -> manager.eraseTasks(), () -> manager.eraseEpics(), () -> manager.eraseSubtasks());
+        Assertions.assertAll("Some of eraseTask operation threw exception", () -> manager.eraseTasks(), () -> manager.eraseEpics(), () -> manager.eraseSubtasks());
 
         manager.saveTask(t1);
         manager.saveTask(t2);
@@ -211,7 +212,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @ParameterizedTest
     @ValueSource(longs = {0, 5, 10})
     public void removeTasksIrregularTest(long id) {
-        Assertions.assertAll("No exceptions expected", () -> manager.removeEpic(id), () -> manager.removeTask(id), () -> manager.removeSubtask(id));
+        Assertions.assertAll("Some of removeTask operations threw exception", () -> manager.removeEpic(id), () -> manager.removeTask(id), () -> manager.removeSubtask(id));
     }
 
     /*Нормальный тест методов updateTask
@@ -266,5 +267,26 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         Assertions.assertEquals(1, manager.getAllEpics().size());
         Assertions.assertEquals("NOW", manager.getTaskByID(3).getDescription());
+    }
+
+    @Test
+    public void updateNonExistingTasks() {
+        Task t1 = new Task("task1", "");
+        Subtask sub1 = new Subtask("sub1", "");
+        Epic epic1 = new Epic("epic1", "", new ArrayList<>());
+
+        manager.updateEpic(epic1);
+        manager.updateSubtask(sub1);
+        manager.updateTask(t1);
+
+        Assertions.assertEquals(0, manager.getAllTasks().size());
+        Assertions.assertEquals(0, manager.getAllSubtasks().size());
+        Assertions.assertEquals(0, manager.getAllEpics().size());
+    }
+
+    @Test
+    public void updateTaskNullTest() {
+        Assertions.assertAll("updateTask test failed with null", () -> manager.updateTask(null),
+                () -> manager.updateSubtask(null), () -> manager.updateEpic(null));
     }
 }
