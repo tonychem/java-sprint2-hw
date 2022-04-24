@@ -4,6 +4,9 @@ import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
+
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 
 public class TaskManagerMain {
@@ -14,9 +17,21 @@ public class TaskManagerMain {
         Task task1 = new Task("Задача №1", "");
         Task task2 = new Task("Задача №2", "", Status.DONE);
 
+        task1.setStartTime(Instant.ofEpochMilli(1_000));
+        task1.setDuration(Duration.ofMillis(1000));
+        task2.setStartTime(Instant.ofEpochMilli(2000));
+        task2.setDuration(Duration.ofMillis(2000));
+
         Subtask sub1 = new Subtask("Подзадача №1", "");
         Subtask sub2 = new Subtask("Подзадача №2", "", Status.IN_PROGRESS);
         Subtask sub3 = new Subtask("Подзадача №3", "");
+
+        sub1.setStartTime(Instant.ofEpochMilli(1_000_000));
+        sub1.setDuration(Duration.ofMillis(1000_000));
+        sub2.setStartTime(Instant.ofEpochMilli(2000_000));
+        sub2.setDuration(Duration.ofMillis(2000_000));
+        sub3.setStartTime(Instant.ofEpochMilli(3000_000));
+        sub3.setDuration(Duration.ofMillis(3000_000));
 
         ArrayList<Subtask> subtasks = new ArrayList<>();
         subtasks.add(sub1);
@@ -32,28 +47,11 @@ public class TaskManagerMain {
         taskManager.saveEpic(epic1);
         taskManager.saveEpic(epic2);
 
-        HistoryManager historyManager = taskManager.getHistoryManager();
-        System.out.println(taskManager);
-
-        //вызов задач в произвольной последовательности с повторами [3 -> 1 -> 3 -> 7 -> 2 -> 1 -> 7 -> 6]
-        taskManager.getTaskByID(3);
-        taskManager.getTaskByID(1);
-        taskManager.getTaskByID(3);
-        taskManager.getTaskByID(7);
-        taskManager.getTaskByID(2);
-        taskManager.getTaskByID(1);
-        taskManager.getTaskByID(7);
-        taskManager.getTaskByID(6);
-
-        //historyManager : [ 3 -> 2 -> 1 -> 7 -> 6 ]
-        System.out.println("Вызов задач в произвольной последовательности с повторами: \n" + historyManager.getHistory());
-
-        //удаление задачи посередине (id = 1)
-        historyManager.remove(1);
-        System.out.println("Удаление задачи с id = 1: \n" + historyManager.getHistory());
-
-        //удаление эпика с 3-мя подзадачами (id = 6)
-        historyManager.remove(6);
-        System.out.println("Удаление эпика с 3-мя подзадачами (id = 6): \n" + historyManager.getHistory());
+        System.out.println(sub1.getStartTime());
+        System.out.println(sub3.getEndTime());
+        System.out.println("_________epic________");
+        System.out.println(epic1.getStartTime());
+        System.out.println(epic1.getDuration());
+        System.out.println(epic1.getEndTime());
     }
 }

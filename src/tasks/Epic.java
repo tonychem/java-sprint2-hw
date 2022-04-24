@@ -1,7 +1,11 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Epic extends Task {
 
@@ -37,6 +41,8 @@ public class Epic extends Task {
             mySubtasks.add(sub);
         }
     }
+
+
 
     public void deleteSubtask(long ID) {
         if (mySubtasks != null) {
@@ -77,6 +83,35 @@ public class Epic extends Task {
         newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.IN_PROGRESS, getMySubtasks());
         newEpicWithUpdatedStatus.setId(getId());
         return newEpicWithUpdatedStatus;
+    }
+
+    @Override
+    public Duration getDuration() {
+        return Duration.between(getStartTime(), getEndTime());
+    }
+
+    @Override
+    public void setDuration(Duration duration) {
+        //Класс закрыт для установки продолжительности
+    }
+
+    @Override
+    public Instant getStartTime() {
+        Optional<Subtask> theEarliestSubtask = mySubtasks.stream()
+                .min(Comparator.comparing(Task::getStartTime));
+        return theEarliestSubtask.isEmpty() ? null : theEarliestSubtask.get().getStartTime();
+    }
+
+    @Override
+    public void setStartTime(Instant startTime) {
+        //Класс закрыт для установки времени начала
+    }
+
+    @Override
+    public Instant getEndTime() {
+        Optional<Subtask> theLatestSubtask = mySubtasks.stream()
+                .max(Comparator.comparing(Task::getStartTime));
+        return theLatestSubtask.isEmpty() ? null : theLatestSubtask.get().getEndTime();
     }
 
     @Override

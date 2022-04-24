@@ -73,7 +73,7 @@ public class Task {
     }
 
     public Instant getEndTime() {
-        return startTime.plus(duration);
+        return duration == null ? null : startTime.plus(duration);
     }
 
     @Override
