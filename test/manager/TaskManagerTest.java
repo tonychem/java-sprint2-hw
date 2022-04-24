@@ -98,8 +98,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void saveTaskIrregularTest() {
+    public void saveTasksIrregularTest() {
         Task task1 = null;
+        Epic epic1 = null;
+        Subtask subtask1 = null;
+
         Assertions.assertThrows(IllegalArgumentException.class, ()-> manager.saveTask(task1));
+        Assertions.assertThrows(IllegalArgumentException.class, ()-> manager.saveSubtask(subtask1));
+        Assertions.assertThrows(IllegalArgumentException.class, ()-> manager.saveEpic(epic1));
     }
 }

@@ -72,7 +72,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void saveTask(Task t) {
         if (t == null) {
-            throw new IllegalArgumentException("attempt to save null value");
+            throw new IllegalArgumentException("попытка записать значение null");
         }
 
         t.setId(assignID);
@@ -82,6 +82,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void saveEpic(Epic epic) {
+        if (epic == null) {
+            throw new IllegalArgumentException("попытка записать значение null");
+        }
         for (Subtask sub : epic.getMySubtasks()) {
             if (!subtaskMap.containsValue(sub)) {
                 sub.setId(assignID);
@@ -97,6 +100,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void saveSubtask(Subtask sub) {
+        if (sub == null) {
+            throw new IllegalArgumentException("попытка записать значение null");
+        }
         if (sub.getMyEpicReference() == null) {
             throw new IllegalArgumentException("Нельзя передавать подзадачу без эпика");
         }
