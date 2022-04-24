@@ -3,6 +3,8 @@ package manager;
 import tasks.*;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -16,20 +18,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         final String inputFilePath = "src/files/input.csv";
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(outputFilePath);
         ArrayList<Subtask> subtasksOfEpic1 = new ArrayList<>();
-        subtasksOfEpic1.add(new Subtask("Подзадание 1", "оп1"));
-        subtasksOfEpic1.add(new Subtask("Подзадание 2", "оп2", Status.IN_PROGRESS));
+        Subtask subtask1OfEpic1 = new Subtask("Подзадание 1", "оп1");
+        subtask1OfEpic1.setStartTime(Instant.ofEpochMilli(10_000_000));
+        subtask1OfEpic1.setDuration(Duration.ofMillis(100_000));
+        subtasksOfEpic1.add(subtask1OfEpic1);
+        Subtask subtask2OfEpic1 = new Subtask("Подзадание 2", "оп2", Status.IN_PROGRESS);
+        subtask2OfEpic1.setStartTime(Instant.ofEpochMilli(1_000_000));
+        subtask2OfEpic1.setDuration(Duration.ofMillis(1_000_000));
+        subtasksOfEpic1.add(subtask2OfEpic1);
 
         Epic epic1 = new Epic("Эпик1", "2 задачи", subtasksOfEpic1);
         Epic epic2 = new Epic("Эпик2", "Пустой", new ArrayList<>());
 
-        Task t1 = new Task("Задание 1", "оп1");
-        Task t2 = new Task("Задание 2", "оп2", Status.DONE);
-
         fileBackedTasksManager.saveEpic(epic1);
         fileBackedTasksManager.saveEpic(epic2);
-
-        fileBackedTasksManager.saveTask(t1);
-        fileBackedTasksManager.saveTask(t2);
 
         fileBackedTasksManager.getTaskByID(1);
         fileBackedTasksManager.getTaskByID(4);
@@ -47,7 +49,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
 
     private void save() {
-        StringBuilder toFileString = new StringBuilder("id,type,name,status,description,epic\n");
+        StringBuilder toFileString = new StringBuilder("id,type,name,status,description,epic,startTime,duration\n");
         File outputFile = new File(pathToFile);
 
         //собирает все задания текущего состояния менеджера в сортированный список
@@ -72,25 +74,57 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     private String writeTask(Task task) {
-        String taskFileRecord = String.format("%d,%s,%s,%s,%s,", task.getId(), task.getType(), task.getTitle(),
-                task.getStatus(), task.getDescription());
+        TaskType type = task.getType();
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("%d,%s,%s,%s,%s,", task.getId(), task.getType(), task.getTitle(),
+                task.getStatus(), task.getDescription()));
 
-        return task.getType() == TaskType.SUBTASK ? taskFileRecord + ((Subtask) task).getMyEpicReference().getId() :
-                taskFileRecord;
+        if (type == TaskType.TASK || type == TaskType.EPIC) {
+            builder.append(",");
+        } else {
+            builder.append(((Subtask) task).getMyEpicReference().getId());
+            builder.append(",");
+        }
+
+        if (task.getStartTime() == null) {
+            builder.append("null,");
+        } else {
+            builder.append(String.format("%d,", task.getStartTime().toEpochMilli()));
+        }
+
+        if (task.getDuration() == null) {
+            builder.append("null");
+        } else {
+            builder.append(String.format("%d", task.getDuration().toMillis()));
+        }
+        return builder.toString();
     }
 
     private Task readTask(String fileString) {
         //Разбивает входную строку на массив строк с содержимым
-        //0.id-1.type-2.name-3.status-4.description-5.epic
+        //0.id-1.type-2.name-3.status-4.description-5.epic-6.startTime-7.duration
         String[] taskData = fileString.split(",");
         Task taskBuilder;
         TaskType taskType = TaskType.valueOf(taskData[1]);
+        Instant startTime = null;
+        Duration duration = null;
+
+        if (!taskData[6].equals("null")) {
+            startTime = Instant.ofEpochMilli(Long.parseLong(taskData[6]));
+        }
+
+        if (!taskData[7].equals("null")) {
+            duration = Duration.ofMillis(Long.parseLong(taskData[7]));
+        }
 
         if (taskType == TaskType.TASK) {
             taskBuilder = new Task(taskData[2], taskData[4], Status.valueOf(taskData[3]));
+            taskBuilder.setStartTime(startTime);
+            taskBuilder.setDuration(duration);
         } else if (taskType == TaskType.EPIC) {
             // Прочитанная строка, содержащая эпик, не дает информации про подзадачи,
-            // поэтому в конструктор эпика передается пустой список подзадач
+            // поэтому в конструктор эпика передается пустой список подзадач,
+            // а также не знает свою длительность и время начала
             taskBuilder = new Epic(taskData[2], taskData[4], new ArrayList<Subtask>());
         } else {
             // Подзадачи содержат поле со ссылкой на свой эпик, но при чтении строки из файла
@@ -98,6 +132,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             Epic dummyEpic = new Epic(null, null, null);
             taskBuilder = new Subtask(taskData[2], taskData[4], Status.valueOf(taskData[3]));
             dummyEpic.setId(Long.parseLong(taskData[5]));
+            taskBuilder.setStartTime(startTime);
+            taskBuilder.setDuration(duration);
             ((Subtask) taskBuilder).setMyEpicReference(dummyEpic);
         }
 

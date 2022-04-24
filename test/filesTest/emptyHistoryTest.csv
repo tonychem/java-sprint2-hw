@@ -1,8 +1,6 @@
-id,type,name,status,description,epic
-1,EPIC,Эпик1,NEW,Пустой,
-2,SUBTASK,Подзадание 2,IN_PROGRESS,оп2,4
-3,SUBTASK,Подзадание 1,NEW,оп1,4
-4,EPIC,Эпик2,IN_PROGRESS,2 задачи,
-5,TASK,Задание 2,DONE,оп2,
-6,TASK,Задание 1,NEW,оп1,
+id,type,name,status,description,epic,startTime,duration
+1,SUBTASK,Подзадание 1,NEW,оп1,3,10000000,100000
+2,SUBTASK,Подзадание 2,IN_PROGRESS,оп2,3,1000000,1000000
+3,EPIC,Эпик1,IN_PROGRESS,2 задачи,,1000000,9000000
+4,EPIC,Эпик2,NEW,Пустой,,null,null
 

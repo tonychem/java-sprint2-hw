@@ -105,9 +105,11 @@ public class Epic extends Task {
 
     @Override
     public Instant getStartTime() {
-        Optional<Subtask> theEarliestSubtask = mySubtasks.stream()
-                .min(Comparator.comparing(Task::getStartTime));
-        return theEarliestSubtask.isEmpty() ? null : theEarliestSubtask.get().getStartTime();
+        Optional<Instant> theEarliestSubtask = mySubtasks.stream()
+                .map(x -> x.getStartTime())
+                .filter(Objects::nonNull)
+                .min(Comparator.naturalOrder());
+        return theEarliestSubtask.orElse(null);
     }
 
     @Override
@@ -117,9 +119,11 @@ public class Epic extends Task {
 
     @Override
     public Instant getEndTime() {
-        Optional<Subtask> theLatestSubtask = mySubtasks.stream()
-                .max(Comparator.comparing(Task::getStartTime));
-        return theLatestSubtask.isEmpty() ? null : theLatestSubtask.get().getEndTime();
+        Optional<Instant> theLatestSubtask = mySubtasks.stream()
+                .map(x -> x.getStartTime())
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder());
+        return theLatestSubtask.orElse(null);
     }
 
     @Override
