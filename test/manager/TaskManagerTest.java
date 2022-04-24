@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
+import tasks.Task;
 
 import java.util.ArrayList;
 
@@ -79,5 +80,20 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         //нельзя сохранять подзадания, которые не были проиндексированы в TaskManager-e
         Assertions.assertThrows(IllegalArgumentException.class, () -> manager.saveSubtask(withoutEpic));
+    }
+
+    @Test
+    public void saveTaskNormalTest() {
+        Task task1 = new Task("1", "");
+        Task task2 = new Task("2", "");
+
+        manager.saveTask(task1);
+        Assertions.assertEquals(1, manager.getAllTasks().size());
+
+        manager.saveTask(task2);
+        Assertions.assertEquals(2, manager.getAllTasks().size());
+
+        manager.eraseTasks();
+        Assertions.assertEquals(0, manager.getAllTasks().size());
     }
 }
