@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public abstract class TaskManagerTest<T extends TaskManager> {
     protected T manager;
 
+    // Проверяет, что эпик сохраняется в менеджере с ожидаемым статусом
     @Test
     public void epicStatusTest() {
         ArrayList<Subtask> subtaskNew = new ArrayList<>();
@@ -63,6 +64,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         }
     }
 
+    // Проверяет, что менеджер устанавливает зависимость между эпика и сабтасками после сохранения
     @Test
     public void shouldSubtasksHaveEpic() {
         ArrayList<Subtask> subtasks = new ArrayList<>();
@@ -82,6 +84,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertThrows(IllegalArgumentException.class, () -> manager.saveSubtask(withoutEpic));
     }
 
+    //нормальный тест saveTask
     @Test
     public void saveTaskNormalTest() {
         Task task1 = new Task("1", "");
@@ -97,14 +100,48 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals(0, manager.getAllTasks().size());
     }
 
+    //сохранение null значений в менеджере
     @Test
-    public void saveTasksIrregularTest() {
+    public void saveTasksNullTest() {
         Task task1 = null;
         Epic epic1 = null;
         Subtask subtask1 = null;
 
-        Assertions.assertThrows(IllegalArgumentException.class, ()-> manager.saveTask(task1));
-        Assertions.assertThrows(IllegalArgumentException.class, ()-> manager.saveSubtask(subtask1));
-        Assertions.assertThrows(IllegalArgumentException.class, ()-> manager.saveEpic(epic1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> manager.saveTask(task1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> manager.saveSubtask(subtask1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> manager.saveEpic(epic1));
+    }
+
+    @Test
+    public void eraseTasksTest() {
+        Task t1 = new Task("1", "");
+        Task t2 = new Task("2", "");
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(new Subtask("1", ""));
+        subtasks.add(new Subtask("2", ""));
+        Epic epicWithSubtasks = new Epic("epic1", "", subtasks);
+        Epic epicWithOutSubtasks = new Epic("epicEMPTY", "", new ArrayList<>());
+
+        Assertions.assertAll("Удаление списка заданий из пустого менеджера:", () -> manager.eraseTasks(),
+                () -> manager.eraseEpics(), () -> manager.eraseSubtasks());
+
+        manager.saveTask(t1);
+        manager.saveTask(t2);
+        Assertions.assertEquals(2, manager.getAllTasks().size());
+
+        manager.eraseTasks();
+        Assertions.assertEquals(0, manager.getAllTasks().size());
+
+        manager.saveEpic(epicWithOutSubtasks);
+        Assertions.assertEquals(1, manager.getAllEpics().size());
+        manager.eraseEpics();
+        Assertions.assertEquals(0, manager.getAllEpics().size());
+
+        manager.saveEpic(epicWithSubtasks);
+        Assertions.assertEquals(2, manager.getAllSubtasks().size());
+
+        manager.eraseSubtasks();
+        Assertions.assertEquals(0, manager.getAllSubtasks().size());
+        Assertions.assertEquals(1, manager.getAllEpics().size());
     }
 }
