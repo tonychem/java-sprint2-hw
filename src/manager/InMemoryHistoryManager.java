@@ -21,12 +21,12 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public void add(Task task) {
         if (task != null) {
+            if (history.size() == MAX_HISTORY_VIEW) {
+                remove(history.head.getData().getId());
+            }
             //если поставляется существующий в HashMap объект, то он только удаляется из двусвязного списка
             if (history.map.containsKey(task.getId())) {
                 history.removeNode(history.map.get(task.getId()));
-            }
-            if (history.size() == MAX_HISTORY_VIEW) {
-                remove(history.head.getData().getId());
             }
             history.linkLast(task);
         }
@@ -90,7 +90,6 @@ public class InMemoryHistoryManager implements HistoryManager {
                     previousNode.setNext(nextNode);
                     nextNode.setPrevious(previousNode);
                 }
-
             }
         }
 
