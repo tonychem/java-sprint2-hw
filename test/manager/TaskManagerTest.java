@@ -96,4 +96,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         manager.eraseTasks();
         Assertions.assertEquals(0, manager.getAllTasks().size());
     }
+
+    @Test
+    public void saveTaskIrregularTest() {
+        Task task1 = null;
+        Assertions.assertThrows(IllegalArgumentException.class, ()-> manager.saveTask(task1));
+    }
 }

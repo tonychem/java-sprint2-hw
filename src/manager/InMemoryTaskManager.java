@@ -71,6 +71,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void saveTask(Task t) {
+        if (t == null) {
+            throw new IllegalArgumentException("attempt to save null value");
+        }
+
         t.setId(assignID);
         taskMap.put(assignID, t);
         assignID++;
