@@ -3,7 +3,6 @@ package manager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import tasks.Epic;
 import tasks.Status;
@@ -209,6 +208,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals(0, manager.getAllEpics().size());
     }
 
+    //удаление задач с несуществующими id
     @ParameterizedTest
     @ValueSource(longs = {0, 5, 10})
     public void removeTasksIrregularTest(long id) {
@@ -232,6 +232,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals("LATER", manager.getTaskByID(1).getDescription());
     }
 
+    //нормальное поведение метода updateSubtask
     @Test
     public void updateSubtaskNormalTest() {
         Subtask subtask1 = new Subtask("id1", "NOW");
@@ -251,6 +252,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals("LATER", manager.getTaskByID(1).getDescription());
     }
 
+    //нормальное поведение метода updateEpic
     @Test
     public void updateEpicNormalTest() {
         Subtask subtask1 = new Subtask("id1", "NOW");
@@ -269,6 +271,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals("NOW", manager.getTaskByID(3).getDescription());
     }
 
+    //обновление заданий, отсутствующих в менеджере
     @Test
     public void updateNonExistingTasks() {
         Task t1 = new Task("task1", "");
@@ -284,6 +287,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals(0, manager.getAllEpics().size());
     }
 
+    //устойчивость метода updateTask к null-у
     @Test
     public void updateTaskNullTest() {
         Assertions.assertAll("updateTask test failed with null", () -> manager.updateTask(null),

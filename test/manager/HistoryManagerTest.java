@@ -7,6 +7,7 @@ import tasks.Task;
 class HistoryManagerTest {
     protected HistoryManager historyManager = new InMemoryHistoryManager();
 
+    //Добавление заданий в историю; оценка поведения при добавлении одинаковых заданий
     @Test
     public void addTaskTest() {
         Task task1 = new Task("task1", "");
@@ -20,11 +21,13 @@ class HistoryManagerTest {
         historyManager.add(task2);
         Assertions.assertEquals(2, historyManager.getHistory().size());
 
+        //тест на дубликаты
         historyManager.add(task2);
         historyManager.add(task1);
         Assertions.assertEquals(2, historyManager.getHistory().size());
     }
 
+    //Нормальное удаление элемента из истории
     @Test
     public void removeExistingHistoryElementTest() {
         Task t1 = new Task("task1", "");
@@ -34,6 +37,7 @@ class HistoryManagerTest {
         Assertions.assertEquals(0, historyManager.getHistory().size());
     }
 
+    //Удаление несуществующего элемента из непустой истории
     @Test
     public void removeNonExistingElementTest() {
         Task t1 = new Task("task1", "");
@@ -42,11 +46,13 @@ class HistoryManagerTest {
         Assertions.assertAll(() -> historyManager.remove(5));
     }
 
+    //Удаление элемента из пустой истории
     @Test
     public void removeOnEmptyHistoryTest() {
         Assertions.assertAll(() -> historyManager.remove(1));
     }
 
+    //Удаление из начала, середины, конца истории
     @Test
     public void removeIndexTest() {
         Task[] taskArray = new Task[5];

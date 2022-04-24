@@ -120,8 +120,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     static List<Long> readHistoryManager(String value) {
         List<Long> listToReturn = new ArrayList<>();
 
-        for (String string : value.split(",")) {
-            listToReturn.add(Long.parseLong(string));
+        if (value != null) {
+            for (String string : value.split(",")) {
+                listToReturn.add(Long.parseLong(string));
+            }
         }
 
         return listToReturn;
