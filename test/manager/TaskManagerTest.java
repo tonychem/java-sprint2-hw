@@ -3,8 +3,6 @@ package manager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import tasks.Epic;
 import tasks.Status;
@@ -127,8 +125,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Epic epicWithSubtasks = new Epic("epic1", "", subtasks);
         Epic epicWithOutSubtasks = new Epic("epicEMPTY", "", new ArrayList<>());
 
-        Assertions.assertAll("Удаление списка заданий из пустого менеджера:", () -> manager.eraseTasks(),
-                () -> manager.eraseEpics(), () -> manager.eraseSubtasks());
+        Assertions.assertAll("Удаление списка заданий из пустого менеджера:", () -> manager.eraseTasks(), () -> manager.eraseEpics(), () -> manager.eraseSubtasks());
 
         manager.saveTask(t1);
         manager.saveTask(t2);
@@ -214,7 +211,42 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @ParameterizedTest
     @ValueSource(longs = {0, 5, 10})
     public void removeTasksIrregularTest(long id) {
-        Assertions.assertAll("No exceptions expected", () -> manager.removeEpic(id),
-                () -> manager.removeTask(id), () -> manager.removeSubtask(id));
+        Assertions.assertAll("No exceptions expected", () -> manager.removeEpic(id), () -> manager.removeTask(id), () -> manager.removeSubtask(id));
+    }
+
+    /*Нормальный тест методов updateTask
+    * Создаем задачу -> сохраняем в менеджер -> извлекаем из менеджера задачу с присвоенным ID -> изменяем описание ->
+      обновляем задачу в менеджере -> оцениваем, что число задач в менеджере не изменилось, а статусы поменялись
+    */
+    @Test
+    public void updateTaskNormalTest() {
+        Task task1 = new Task("Do something", "NOW");
+        manager.saveTask(task1);
+        Task task1Retrieved = manager.getTaskByID(1);
+        task1Retrieved.setDescription("LATER");
+        manager.updateTask(task1Retrieved);
+
+        Assertions.assertEquals(1, manager.getAllTasks().size());
+        Assertions.assertEquals(task1Retrieved, manager.getTaskByID(1));
+        Assertions.assertEquals("LATER", manager.getTaskByID(1).getDescription());
+    }
+
+    @Test
+    public void updateSubtaskNormalTest() {
+        Subtask subtask1 = new Subtask("id1", "NOW");
+        Subtask subtask2 = new Subtask("id2", "NOW");
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(subtask1);
+        subtasks.add(subtask2);
+        Epic epic = new Epic("id3", "", subtasks);
+
+        manager.saveEpic(epic);
+        Subtask subtask1Retrieved = (Subtask) manager.getTaskByID(1);
+        subtask1Retrieved.setDescription("LATER");
+        manager.updateSubtask(subtask1Retrieved);
+
+        Assertions.assertEquals(2, manager.getAllSubtasks().size());
+        Assertions.assertEquals(subtask1Retrieved, manager.getTaskByID(1));
+        Assertions.assertEquals("LATER", manager.getTaskByID(1).getDescription());
     }
 }

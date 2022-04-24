@@ -64,8 +64,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskByID(long ID) {
-        Task taskToReturn = taskMap.get(ID) != null ? taskMap.get(ID) : (epicMap.get(ID) != null ?
-                epicMap.get(ID) : (subtaskMap.get(ID) != null ? subtaskMap.get(ID) : null));
+        Task taskToReturn = taskMap.get(ID) != null ? taskMap.get(ID) : (epicMap.get(ID) != null ? epicMap.get(ID) : (subtaskMap.get(ID) != null ? subtaskMap.get(ID) : null));
         historyManager.add(taskToReturn);
         return taskToReturn;
     }
@@ -151,8 +150,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtask(long ID) {
         Optional<Subtask> subtaskInQuestion = Optional.ofNullable(subtaskMap.get(ID));
-        Optional<Epic> epicAffected = subtaskInQuestion.isPresent() ? subtaskInQuestion.map(Subtask::getMyEpicReference)
-                : Optional.empty();
+        Optional<Epic> epicAffected = subtaskInQuestion.isPresent() ? subtaskInQuestion.map(Subtask::getMyEpicReference) : Optional.empty();
 
         if (epicAffected.isPresent()) {
             epicAffected.get().deleteSubtask(ID);
