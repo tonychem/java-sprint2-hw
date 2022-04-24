@@ -165,7 +165,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (epicInQuestion != null) {
             for (Subtask subtask : epicInQuestion.getMySubtasks()) {
-                if (subtask.getMyEpicReference() == epicInQuestion) {
+                if (subtask.getMyEpicReference().equals(epicInQuestion)) {
                     subtaskMap.remove(subtask.getId());
                 }
             }

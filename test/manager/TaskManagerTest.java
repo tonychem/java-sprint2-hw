@@ -2,6 +2,10 @@ package manager;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -168,5 +172,47 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 Assertions.assertEquals(e1, retrieved);
             }
         }
+    }
+
+    //Получение несуществующих заданий из менеджера
+    @ParameterizedTest
+    @ValueSource(longs = {0, 5, 10})
+    public void getTaskByIdNonExistentTasksTest(long id) {
+        Assertions.assertNull(manager.getTaskByID(id));
+    }
+
+    @Test
+    public void removeTasksNormalTest() {
+        Task task1 = new Task("Task1", "id1");
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(new Subtask("Subtask1", "id2"));
+        subtasks.add(new Subtask("Subtask2", "id3"));
+        Epic epicWithTasks = new Epic("EpicWithTasks", "id4", subtasks);
+        Epic epicWithOutSubtasks = new Epic("Epic without subtasks", "id5", new ArrayList<>());
+
+        manager.saveTask(task1);
+        manager.saveEpic(epicWithTasks);
+        manager.saveEpic(epicWithOutSubtasks);
+
+        Assertions.assertEquals(1, manager.getAllTasks().size());
+        manager.removeTask(1);
+        Assertions.assertEquals(0, manager.getAllTasks().size());
+
+        manager.removeSubtask(2);
+        Assertions.assertEquals(1, manager.getAllSubtasks().size());
+        Assertions.assertEquals(1, manager.extractSubtaskList(4).size());
+
+        manager.removeEpic(5);
+        Assertions.assertEquals(1, manager.getAllEpics().size());
+
+        //удаление эпика с 1 оставшейся подзадачей
+        manager.removeEpic(4);
+        Assertions.assertEquals(0, manager.getAllSubtasks().size());
+        Assertions.assertEquals(0, manager.getAllEpics().size());
+    }
+
+    @Test
+    public void removeTasksIrregularTest() {
+        
     }
 }
