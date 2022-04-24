@@ -1,5 +1,7 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 
 public class Task {
@@ -8,6 +10,8 @@ public class Task {
     private String description;
     private long id;
     private Status status;
+    private Duration duration;
+    private Instant startTime;
 
     public Task(String title, String description) {
         this.title = title;
@@ -50,6 +54,26 @@ public class Task {
 
     public Status getStatus() {
         return status;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public Instant getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
+    }
+
+    public Instant getEndTime() {
+        return startTime.plus(duration);
     }
 
     @Override
