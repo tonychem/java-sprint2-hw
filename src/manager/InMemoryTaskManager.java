@@ -6,6 +6,7 @@ import tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Long, Task> taskMap;
@@ -149,12 +150,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeSubtask(long ID) {
-        Subtask subtaskInQuestion = subtaskMap.get(ID);
-        Epic epicAffected = subtaskInQuestion.getMyEpicReference();
+        Optional<Subtask> subtaskInQuestion = Optional.ofNullable(subtaskMap.get(ID));
+        Optional<Epic> epicAffected = subtaskInQuestion.isPresent() ? subtaskInQuestion.map(Subtask::getMyEpicReference)
+                : Optional.empty();
 
-        if (epicAffected != null) {
-            epicAffected.deleteSubtask(ID);
-            updateEpic(epicAffected.update());
+        if (epicAffected.isPresent()) {
+            epicAffected.get().deleteSubtask(ID);
+            updateEpic(epicAffected.get().update());
             subtaskMap.remove(ID);
         }
     }

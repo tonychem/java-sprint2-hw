@@ -211,8 +211,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals(0, manager.getAllEpics().size());
     }
 
-    @Test
-    public void removeTasksIrregularTest() {
-        
+    @ParameterizedTest
+    @ValueSource(longs = {0, 5, 10})
+    public void removeTasksIrregularTest(long id) {
+        Assertions.assertAll("No exceptions expected", () -> manager.removeEpic(id),
+                () -> manager.removeTask(id), () -> manager.removeSubtask(id));
     }
 }
