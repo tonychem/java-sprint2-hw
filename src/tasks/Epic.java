@@ -12,6 +12,9 @@ public class Epic extends Task {
     private static TaskType type = TaskType.EPIC;
 
     private ArrayList<Subtask> mySubtasks;
+    private Instant startTime;
+    private Instant endTime;
+    private Duration duration;
 
     public Epic(String title, String description, ArrayList<Subtask> subtasks) {
         super(title, description);
@@ -41,8 +44,6 @@ public class Epic extends Task {
             mySubtasks.add(sub);
         }
     }
-
-
 
     public void deleteSubtask(long ID) {
         if (mySubtasks != null) {
@@ -82,12 +83,19 @@ public class Epic extends Task {
 
         newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.IN_PROGRESS, getMySubtasks());
         newEpicWithUpdatedStatus.setId(getId());
+
+        newEpicWithUpdatedStatus.startTime = getStartTime();
+        newEpicWithUpdatedStatus.endTime = getEndTime();
+        newEpicWithUpdatedStatus.duration = getDuration();
+
         return newEpicWithUpdatedStatus;
     }
 
     @Override
     public Duration getDuration() {
-        return Duration.between(getStartTime(), getEndTime());
+        Instant startTime = getStartTime();
+        Instant endTime = getEndTime();
+        return (startTime == null || endTime == null) ? null : Duration.between(startTime, endTime);
     }
 
     @Override
@@ -138,7 +146,7 @@ public class Epic extends Task {
     @Override
     public int hashCode() {
         int hash = Objects.hash(getTitle(), getDescription(), getStatus());
-        hash = 31 * hash + (mySubtasks == null? 0 : mySubtasks.hashCode());
+        hash = 31 * hash + (mySubtasks == null ? 0 : mySubtasks.hashCode());
         return hash;
     }
 }

@@ -46,12 +46,6 @@ public class TaskManagerMain {
         taskManager.saveTask(task2);
         taskManager.saveEpic(epic1);
         taskManager.saveEpic(epic2);
-
-        System.out.println(sub1.getStartTime());
-        System.out.println(sub3.getEndTime());
-        System.out.println("_________epic________");
-        System.out.println(epic1.getStartTime());
-        System.out.println(epic1.getDuration());
-        System.out.println(epic1.getEndTime());
+        
     }
 }
