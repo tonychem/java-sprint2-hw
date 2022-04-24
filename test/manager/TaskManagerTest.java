@@ -249,4 +249,22 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals(subtask1Retrieved, manager.getTaskByID(1));
         Assertions.assertEquals("LATER", manager.getTaskByID(1).getDescription());
     }
+
+    @Test
+    public void updateEpicNormalTest() {
+        Subtask subtask1 = new Subtask("id1", "NOW");
+        Subtask subtask2 = new Subtask("id2", "NOW");
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(subtask1);
+        subtasks.add(subtask2);
+        Epic epic = new Epic("id3", "", subtasks);
+
+        manager.saveEpic(epic);
+        Epic epicRetrieved = (Epic) manager.getTaskByID(3);
+        epicRetrieved.setDescription("NOW");
+        manager.updateEpic(epicRetrieved);
+
+        Assertions.assertEquals(1, manager.getAllEpics().size());
+        Assertions.assertEquals("NOW", manager.getTaskByID(3).getDescription());
+    }
 }
