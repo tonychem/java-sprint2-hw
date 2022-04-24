@@ -47,5 +47,31 @@ class HistoryManagerTest {
         Assertions.assertAll(() -> historyManager.remove(1));
     }
 
+    @Test
+    public void removeIndexTest() {
+        Task[] taskArray = new Task[5];
 
+        for (int i = 0; i < 5; i++) {
+            taskArray[i] = new Task(String.format("t%d", i + 1), "");
+        }
+
+        for (int i = 0; i < 5; i++) {
+            taskArray[i].setId(i + 1);
+            historyManager.add(taskArray[i]);
+        }
+        //удаление 1-ого элемента; проверить, что история сместилась после удаления на 1.
+        historyManager.remove(1);
+
+        Assertions.assertEquals(4, historyManager.getHistory().size());
+        Assertions.assertEquals(taskArray[1], historyManager.getHistory().get(0));
+
+        //удаление из середины оставшегося списка, проверка соседних от 3-его элементов
+        historyManager.remove(3);
+        Assertions.assertEquals(taskArray[1], historyManager.getHistory().get(0));
+        Assertions.assertEquals(taskArray[3], historyManager.getHistory().get(1));
+
+        //удаление последнего элемента
+        historyManager.remove(5);
+        Assertions.assertEquals(taskArray[3], historyManager.getHistory().get(1));
+    }
 }
