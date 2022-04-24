@@ -64,7 +64,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         }
     }
 
-    // Проверяет, что менеджер устанавливает зависимость между эпика и сабтасками после сохранения
+    // Проверяет, что менеджер устанавливает зависимость между эпиком и сабтасками после сохранения
     @Test
     public void shouldSubtasksHaveEpic() {
         ArrayList<Subtask> subtasks = new ArrayList<>();
@@ -112,6 +112,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertThrows(IllegalArgumentException.class, () -> manager.saveEpic(epic1));
     }
 
+    //Проверяет корректное удаление всех списков заданий из менеджера
     @Test
     public void eraseTasksTest() {
         Task t1 = new Task("1", "");
@@ -143,5 +144,29 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         manager.eraseSubtasks();
         Assertions.assertEquals(0, manager.getAllSubtasks().size());
         Assertions.assertEquals(1, manager.getAllEpics().size());
+    }
+
+    // Нормальный тест извлечение заданий из менеджера по ID
+    @Test
+    public void getTaskByIdNormalTest() {
+        Task t1 = new Task("1", "");
+        Subtask subtask = new Subtask("2", "");
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(subtask);
+        Epic e1 = new Epic("3", "", subtasks);
+
+        manager.saveTask(t1);
+        manager.saveEpic(e1);
+
+        for (int i = 1; i <= 3; i++) {
+            Task retrieved = manager.getTaskByID(i);
+            if (i == 1) {
+                Assertions.assertEquals(t1, retrieved);
+            } else if (i == 2) {
+                Assertions.assertEquals(subtask, retrieved);
+            } else {
+                Assertions.assertEquals(e1, retrieved);
+            }
+        }
     }
 }
