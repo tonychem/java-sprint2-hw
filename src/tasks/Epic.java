@@ -26,6 +26,14 @@ public class Epic extends Task {
         this.mySubtasks = subtasks;
     }
 
+    private Epic(String title, String description, Status status, ArrayList<Subtask> subtasks,
+                 Instant startTime, Duration duration) {
+        super(title, description, status);
+        this.mySubtasks = subtasks;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
     public ArrayList<Subtask> getMySubtasks() {
         return mySubtasks;
     }
@@ -72,21 +80,20 @@ public class Epic extends Task {
         }
 
         if (mySubtasks.isEmpty() || allNEW) {
-            newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), getMySubtasks());
+            newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.NEW, getMySubtasks(),
+                    getStartTime(), getDuration());
             newEpicWithUpdatedStatus.setId(getId());
             return newEpicWithUpdatedStatus;
         } else if (allDONE) {
-            newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.DONE, getMySubtasks());
+            newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.DONE, getMySubtasks(),
+                    getStartTime(), getDuration());
             newEpicWithUpdatedStatus.setId(getId());
             return newEpicWithUpdatedStatus;
         }
 
-        newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.IN_PROGRESS, getMySubtasks());
+        newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.IN_PROGRESS, getMySubtasks(),
+                getStartTime(), getDuration());
         newEpicWithUpdatedStatus.setId(getId());
-
-        newEpicWithUpdatedStatus.startTime = getStartTime();
-        newEpicWithUpdatedStatus.endTime = getEndTime();
-        newEpicWithUpdatedStatus.duration = getDuration();
 
         return newEpicWithUpdatedStatus;
     }

@@ -24,6 +24,15 @@ public class Task {
         this.status = status;
     }
 
+    public Task(String title, String description, Status status, Instant startTime, Duration duration) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -73,7 +82,7 @@ public class Task {
     }
 
     public Instant getEndTime() {
-        return duration == null ? null : startTime.plus(duration);
+        return (duration == null || startTime == null) ? null : startTime.plus(duration);
     }
 
     @Override
