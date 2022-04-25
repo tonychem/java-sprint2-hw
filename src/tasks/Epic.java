@@ -127,7 +127,7 @@ public class Epic extends Task {
     @Override
     public Instant getEndTime() {
         Optional<Instant> theLatestSubtaskInstant = mySubtasks.stream()
-                .map(x -> x.getStartTime())
+                .map(x -> x.getEndTime())
                 .filter(Objects::nonNull)
                 .max(Comparator.naturalOrder());
         return theLatestSubtaskInstant.orElse(null);

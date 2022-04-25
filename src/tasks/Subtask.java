@@ -1,5 +1,7 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -14,6 +16,10 @@ public class Subtask extends Task {
 
     public Subtask(String title, String description, Status status) {
         super(title, description, status);
+    }
+
+    public Subtask(String title, String description, Status status, Instant startTime, Duration duration) {
+        super(title, description, status, startTime, duration);
     }
 
     public Epic getMyEpicReference() {
