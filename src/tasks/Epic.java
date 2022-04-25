@@ -13,7 +13,6 @@ public class Epic extends Task {
 
     private ArrayList<Subtask> mySubtasks;
     private Instant startTime;
-    private Instant endTime;
     private Duration duration;
 
     public Epic(String title, String description, ArrayList<Subtask> subtasks) {
