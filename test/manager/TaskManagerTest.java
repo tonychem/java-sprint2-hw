@@ -9,6 +9,8 @@ import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 
 public abstract class TaskManagerTest<T extends TaskManager> {
@@ -292,5 +294,28 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void updateTaskNullTest() {
         Assertions.assertAll("updateTask test failed with null", () -> manager.updateTask(null),
                 () -> manager.updateSubtask(null), () -> manager.updateEpic(null));
+    }
+
+    @Test
+    public void prioritizedTaskSetNormalTest() {
+        Task t1 = new Task("test1", ""); //all-null
+        Task t2 = new Task("test2", "", Status.NEW, Instant.ofEpochSecond(5), null); // 5 -> null
+        Task t3 = new Task("test3", "", Status.NEW, Instant.ofEpochSecond(10),
+                Duration.ofMinutes(5)); // 10 -> 300 c
+        Subtask subtask1 = new Subtask("test4", "NOW", Status.NEW, Instant.ofEpochSecond(20),
+                Duration.ofSeconds(600)); // 20 -> 620
+        Subtask subtask2 = new Subtask("test5", "NOW", Status.NEW, Instant.ofEpochSecond(30),
+                Duration.ofSeconds(600)); // 30 -> 630
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(subtask1);
+        subtasks.add(subtask2);
+        Epic epic = new Epic("test6", "", subtasks); // 20 -> 630
+
+        manager.saveEpic(epic);
+        manager.saveTask(t1);
+        manager.saveTask(t2);
+        manager.saveTask(t3);
+
+        Assertions.assertEquals(t2, manager.getPrioritizedTasks().first());
     }
 }

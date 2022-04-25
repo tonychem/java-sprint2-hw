@@ -125,7 +125,7 @@ class EpicTest {
         subtasks.add(subtask2);
         subtasks.add(subtask3);
         subtasks.add(subtask4);
-        
+
         Epic epic = new Epic("epic", "", subtasks).update();
 
         Assertions.assertEquals(Instant.ofEpochSecond(120), epic.getEndTime());
