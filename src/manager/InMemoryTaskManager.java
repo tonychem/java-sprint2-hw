@@ -6,7 +6,10 @@ import tasks.Task;
 import tasks.TaskType;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.TreeSet;
 
 import static java.util.Comparator.*;
 
@@ -34,10 +37,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public boolean hasIntersection(Task t) {
         Instant taskStartTime = t.getStartTime();
+        if (taskStartTime == null) {
+            return false;
+        }
         //Проверяем, что в стриме нет заданий, интервал выполнения которых [время начала, время конца] включает startTime;
-        return prioritizedTaskSet.stream()
-                .filter(x -> x.getEndTime() != null)
-                .anyMatch(x -> x.getStartTime().isBefore(taskStartTime) && x.getEndTime().isAfter(taskStartTime));
+        return prioritizedTaskSet.stream().filter(x -> x.getEndTime() != null).anyMatch(x -> x.getStartTime().isBefore(taskStartTime) && x.getEndTime().isAfter(taskStartTime));
     }
 
     @Override
@@ -95,11 +99,12 @@ public class InMemoryTaskManager implements TaskManager {
         if (t == null) {
             throw new IllegalArgumentException("попытка записать значение null");
         }
-
-        t.setId(assignID);
-        taskMap.put(assignID, t);
-        prioritizedTaskSet.add(t);
-        assignID++;
+        if (!hasIntersection(t)) {
+            t.setId(assignID);
+            taskMap.put(assignID, t);
+            prioritizedTaskSet.add(t);
+            assignID++;
+        }
     }
 
     @Override
@@ -107,20 +112,22 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             throw new IllegalArgumentException("попытка записать значение null");
         }
-        for (Subtask sub : epic.getMySubtasks()) {
-            if (!subtaskMap.containsValue(sub)) {
-                sub.setId(assignID);
-                sub.setMyEpicReference(epic);
-                subtaskMap.put(assignID, sub);
-                assignID++;
+        if (!hasIntersection(epic)) {
+            for (Subtask sub : epic.getMySubtasks()) {
+                if (!subtaskMap.containsValue(sub)) {
+                    sub.setId(assignID);
+                    sub.setMyEpicReference(epic);
+                    subtaskMap.put(assignID, sub);
+                    assignID++;
+                }
             }
-        }
-        epic.setId(assignID);
+            epic.setId(assignID);
 
-        Epic updated = epic.update();
-        epicMap.put(assignID, updated);
-        prioritizedTaskSet.add(updated);
-        assignID++;
+            Epic updated = epic.update();
+            epicMap.put(assignID, updated);
+            prioritizedTaskSet.add(updated);
+            assignID++;
+        }
     }
 
     @Override
@@ -131,7 +138,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (sub.getMyEpicReference() == null) {
             throw new IllegalArgumentException("Нельзя передавать подзадачу без эпика");
         }
-        if (!subtaskMap.containsValue(sub)) {
+        if (!hasIntersection(sub) && !subtaskMap.containsValue(sub)) {
             sub.setId(assignID);
             subtaskMap.put(assignID, sub);
             prioritizedTaskSet.add(sub);
@@ -144,7 +151,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task task) {
         if (task == null || task.getId() == 0 || taskMap.containsValue(task)) {
             return;
-        } else {
+        } else if (!hasIntersection(task)) {
             prioritizedTaskSet.removeIf(x -> x.getId() == task.getId());
             prioritizedTaskSet.add(task);
             taskMap.put(task.getId(), task);
@@ -155,7 +162,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic epic) {
         if (epic == null || epic.getId() == 0 || epicMap.containsValue(epic)) {
             return;
-        } else {
+        } else if (!hasIntersection(epic)) {
             Epic epicUpdated = epic.update();
             prioritizedTaskSet.removeIf(x -> x.getId() == epic.getId());
             prioritizedTaskSet.add(epicUpdated);
@@ -167,7 +174,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubtask(Subtask subtask) {
         if (subtask == null || subtask.getId() == 0 || subtaskMap.containsValue(subtask)) {
             return;
-        } else {
+        } else if (!hasIntersection(subtask)) {
             subtaskMap.put(subtask.getId(), subtask);
             prioritizedTaskSet.removeIf(x -> x.getId() == subtask.getId());
             prioritizedTaskSet.add(subtask);
@@ -184,8 +191,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtask(long ID) {
         Optional<Subtask> subtaskInQuestion = Optional.ofNullable(subtaskMap.get(ID));
-        Optional<Epic> epicAffected = subtaskInQuestion.isPresent() ?
-                subtaskInQuestion.map(Subtask::getMyEpicReference) : Optional.empty();
+        Optional<Epic> epicAffected = subtaskInQuestion.isPresent() ? subtaskInQuestion.map(Subtask::getMyEpicReference) : Optional.empty();
 
         if (epicAffected.isPresent()) {
             epicAffected.get().deleteSubtask(ID);

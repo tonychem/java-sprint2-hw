@@ -335,7 +335,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         //Task2 [startTime = 102, endTime = 200]
         //Task3 [startTime = 50, endTime = 80]  -> внутри Task1
         //Task4 [startTime = 50, endTime = 101] -> частично внутри Task1
-        //Task5 [startTime = 101, endTime = 102] -> пересекаются с Task2 на границе
+        //Task5 [startTime = 101, endTime = 102] -> граничит с Task2 и Task4
 
         Task t1 = new Task("t1", "", Status.NEW, Instant.ofEpochSecond(0), Duration.ofSeconds(100));
         Task t2 = new Task("t2", "", Status.NEW, Instant.ofEpochSecond(102), Duration.ofSeconds(200));
@@ -354,7 +354,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         manager.saveTask(t3);
         Assertions.assertTrue(manager.hasIntersection(t4));
 
-        manager.saveTask(t3);
-        Assertions.assertTrue(manager.hasIntersection(t5));
+        manager.saveTask(t4);
+        Assertions.assertFalse(manager.hasIntersection(t5));
     }
 }
