@@ -311,11 +311,21 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         subtasks.add(subtask2);
         Epic epic = new Epic("test6", "", subtasks); // 20 -> 630
 
-        manager.saveEpic(epic);
-        manager.saveTask(t1);
-        manager.saveTask(t2);
-        manager.saveTask(t3);
+        manager.saveEpic(epic); //id1
+        manager.saveTask(t1); //id4
+        manager.saveTask(t2); //id5
+        manager.saveTask(t3); //id6
 
         Assertions.assertEquals(t2, manager.getPrioritizedTasks().first());
+        Assertions.assertEquals(4, manager.getPrioritizedTasks().size());
+
+        manager.eraseEpics();
+        Assertions.assertEquals(3, manager.getPrioritizedTasks().size());
+
+        Task taskRetrieved = manager.getTaskByID(4);
+        taskRetrieved.setDescription("description changed");
+        manager.updateTask(taskRetrieved);
+
+        Assertions.assertEquals(3, manager.getPrioritizedTasks().size()); // размер не изменился
     }
 }
