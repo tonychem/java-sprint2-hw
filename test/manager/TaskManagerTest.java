@@ -328,4 +328,33 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         Assertions.assertEquals(3, manager.getPrioritizedTasks().size()); // размер не изменился
     }
+
+    @Test
+    public void timeIntersectionTest() {
+        //Task1 [startTime = 0, endTime = 100]
+        //Task2 [startTime = 102, endTime = 200]
+        //Task3 [startTime = 50, endTime = 80]  -> внутри Task1
+        //Task4 [startTime = 50, endTime = 101] -> частично внутри Task1
+        //Task5 [startTime = 101, endTime = 102] -> пересекаются с Task2 на границе
+
+        Task t1 = new Task("t1", "", Status.NEW, Instant.ofEpochSecond(0), Duration.ofSeconds(100));
+        Task t2 = new Task("t2", "", Status.NEW, Instant.ofEpochSecond(102), Duration.ofSeconds(200));
+        Task t3 = new Task("t3", "", Status.NEW, Instant.ofEpochSecond(50), Duration.ofSeconds(80));
+        Task t4 = new Task("t4", "", Status.NEW, Instant.ofEpochSecond(50), Duration.ofSeconds(101));
+        Task t5 = new Task("t5", "", Status.NEW, Instant.ofEpochSecond(101), Duration.ofSeconds(102));
+
+        Assertions.assertFalse(manager.hasIntersection(t1));
+
+        manager.saveTask(t1);
+        Assertions.assertFalse(manager.hasIntersection(t2));
+
+        manager.saveTask(t2);
+        Assertions.assertTrue(manager.hasIntersection(t3));
+
+        manager.saveTask(t3);
+        Assertions.assertTrue(manager.hasIntersection(t4));
+
+        manager.saveTask(t3);
+        Assertions.assertTrue(manager.hasIntersection(t5));
+    }
 }

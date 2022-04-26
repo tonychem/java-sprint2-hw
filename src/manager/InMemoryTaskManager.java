@@ -5,10 +5,8 @@ import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.TreeSet;
+import java.time.Instant;
+import java.util.*;
 
 import static java.util.Comparator.*;
 
@@ -31,6 +29,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public TreeSet<Task> getPrioritizedTasks() {
         return prioritizedTaskSet;
+    }
+
+    @Override
+    public boolean hasIntersection(Task t) {
+        Instant taskStartTime = t.getStartTime();
+        //Проверяем, что в стриме нет заданий, интервал выполнения которых [время начала, время конца] включает startTime;
+        return prioritizedTaskSet.stream()
+                .filter(x -> x.getEndTime() != null)
+                .anyMatch(x -> x.getStartTime().isBefore(taskStartTime) && x.getEndTime().isAfter(taskStartTime));
     }
 
     @Override

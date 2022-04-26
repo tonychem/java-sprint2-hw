@@ -35,6 +35,8 @@ public interface TaskManager {
 
     Task getTaskByID(long ID);
 
+    boolean hasIntersection(Task t);
+
     TreeSet<Task> getPrioritizedTasks();
 
     ArrayList<Subtask> extractSubtaskList(long epicID);
