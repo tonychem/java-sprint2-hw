@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static final int MAX_HISTORY_VIEW = 10;
     private final TaskLinkedList<Task> history;
 
     public InMemoryHistoryManager() {
@@ -21,9 +20,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public void add(Task task) {
         if (task != null) {
-            if (history.size() == MAX_HISTORY_VIEW) {
-                remove(history.head.getData().getId());
-            }
             //если поставляется существующий в HashMap объект, то он только удаляется из двусвязного списка
             if (history.map.containsKey(task.getId())) {
                 history.removeNode(history.map.get(task.getId()));
@@ -37,20 +33,17 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void remove(long id) {
         Node nodeToRemove = history.map.remove(id);
         history.removeNode(nodeToRemove);
-        history.size--;
     }
 
     class TaskLinkedList<T extends Task> {
         private Node head;
         private Node tail;
         private Map<Long, Node> map;
-        private int size;
 
         public TaskLinkedList() {
             head = null;
             tail = null;
             map = new HashMap<>();
-            size = 0;
         }
 
         public void linkLast(T task) {
@@ -64,11 +57,6 @@ public class InMemoryHistoryManager implements HistoryManager {
                 oldTail.setNext(newTail);
             }
             tail = newTail;
-            size++;
-        }
-
-        public int size() {
-            return size;
         }
 
         //Метод перезаписывает ссылки внутри предыдущего и следующего узлов друг на друга
