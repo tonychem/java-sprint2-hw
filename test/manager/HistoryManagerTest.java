@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tasks.Task;
 
-class HistoryManagerTest {
+public class HistoryManagerTest {
     protected HistoryManager historyManager = new InMemoryHistoryManager();
 
     //Добавление заданий в историю; оценка поведения при добавлении одинаковых заданий

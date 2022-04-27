@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.Instant;
 
-class TaskTest {
+public class TaskTest {
 
     @Test
     public void shouldCalculateEndTimeNormalTest() {

@@ -10,7 +10,7 @@ import tasks.Task;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-class FileBackedTasksManagerTest extends TaskManagerTest<InMemoryTaskManager> {
+public class FileBackedTasksManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     Path pathToOutputFileTest = Path.of(System.getProperty("user.dir"));
 
     @BeforeEach

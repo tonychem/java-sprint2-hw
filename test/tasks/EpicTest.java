@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class EpicTest {
+public class EpicTest {
 
     @Test
     public void shouldBeNewIfSubtaskListEmpty() {
