@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class TaskTypeAdapter extends TypeAdapter<Task> {
     @Override
@@ -53,32 +54,32 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
         String name = null;
         Status status = null;
         String description = null;
-        String epicId = null;
+        long epicId = 0;
         Instant startTime = null;
         Duration duration = null;
         Task taskToReturn = null;
 
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
-            String fieldName = jsonReader.nextName();
+            String fieldName = jsonReader.nextName().toLowerCase();
             switch (fieldName) {
                 case "id":
                     jsonReader.nextString(); //пропускаем строку, назначение id делегируется менеджеру
                     break;
                 case "type":
-                    type = TaskType.valueOf(jsonReader.nextString());
+                    type = TaskType.valueOf(jsonReader.nextString().toUpperCase());
                     break;
                 case "name":
                     name = jsonReader.nextString();
                     break;
                 case "status":
-                    status = Status.valueOf(jsonReader.nextString());
+                    status = Status.valueOf(jsonReader.nextString().toUpperCase());
                     break;
                 case "description":
                     description = jsonReader.nextString();
                     break;
                 case "epic":
-                    epicId = jsonReader.nextString();
+                    epicId = jsonReader.nextLong();
                     break;
                 case "startTime":
                     startTime = Instant.ofEpochMilli(jsonReader.nextLong());
@@ -95,7 +96,6 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
         switch (type) {
             case TASK:
                 taskToReturn = new Task(name, description, status, startTime, duration);
-
                 break;
             case SUBTASK:
                 taskToReturn = new Subtask(name, description, status, startTime, duration);
@@ -103,7 +103,7 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
                 // при десериализации подзадание не знает свои эпики, поэтому присваиваем эпик-заглушку
                 // для сохранения его ID
                 Epic dummy = new Epic(null, null, null);
-                dummy.setId(Long.parseLong(epicId));
+                dummy.setId(epicId);
                 ((Subtask) taskToReturn).setMyEpicReference(dummy);
                 break;
             case EPIC:
@@ -127,7 +127,6 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
                 }
                 break;
         }
-
         return taskToReturn;
     }
 }

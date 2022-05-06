@@ -18,4 +18,5 @@ public class JsonTaskIO {
     public static Task read(String json) {
         return gson.fromJson(json, Task.class);
     }
+
 }

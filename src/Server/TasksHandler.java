@@ -34,11 +34,8 @@ public class TasksHandler implements HttpHandler {
                 exchange.sendResponseHeaders(201, 0);
                 InputStream is = exchange.getRequestBody();
                 String jsonTask = new String(is.readAllBytes());
-                System.out.println(jsonTask);
                 manager.saveTask(JsonTaskIO.read(jsonTask));
-                is.close();
-                OutputStream os = exchange.getResponseBody();
-                os.close();
+                exchange.close();
             }
         }
     }

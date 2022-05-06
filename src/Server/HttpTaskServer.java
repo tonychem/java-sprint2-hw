@@ -18,8 +18,11 @@ public class HttpTaskServer {
 
     public HttpTaskServer() throws IOException {
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
-        path = System.getProperty("user.dir") + "\\src\\Server\\TaskManagerFile.csv";
-        manager = Managers.getFileBackedTasksManager(path);
+        //Работа с HttpTaskServer идет во временный файл, удаляемый по окончании работы
+        path = System.getProperty("user.dir") + "\\src\\Server";
+        File temporaryFileForStorage = File.createTempFile("TaskManagerFile", ".csv", new File(path));
+        temporaryFileForStorage.deleteOnExit();
+        manager = Managers.getFileBackedTasksManager(temporaryFileForStorage.getAbsolutePath());
     }
 
     public static void main(String[] args) {
