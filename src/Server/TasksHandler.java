@@ -4,7 +4,7 @@ import JsonTaskBuilder.JsonTask;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
-import tasks.Task;
+import tasks.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,12 +47,24 @@ public class TasksHandler implements HttpHandler {
         }
     }
 
-    private void subtaskHandler(HttpExchange exchange) {
-
+    private void subtaskHandler(HttpExchange exchange) throws IOException {
+        if (exchange.getRequestMethod().equals("POST")) {
+            exchange.sendResponseHeaders(201, 0);
+            InputStream is = exchange.getRequestBody();
+            String jsonTask = new String(is.readAllBytes());
+            manager.saveSubtask( (Subtask) JsonTask.readSubtask(jsonTask));
+            exchange.close();
+        }
     }
 
-    private void epicHandler(HttpExchange exchange) {
-
+    private void epicHandler(HttpExchange exchange) throws IOException {
+        if (exchange.getRequestMethod().equals("POST")) {
+            exchange.sendResponseHeaders(201, 0);
+            InputStream is = exchange.getRequestBody();
+            String jsonTask = new String(is.readAllBytes());
+            manager.saveEpic((Epic) JsonTask.readEpic(jsonTask));
+            exchange.close();
+        }
     }
 
     private void taskHandler(HttpExchange exchange) throws IOException {
@@ -60,12 +72,8 @@ public class TasksHandler implements HttpHandler {
             exchange.sendResponseHeaders(201, 0);
             InputStream is = exchange.getRequestBody();
             String jsonTask = new String(is.readAllBytes());
-            manager.saveTask(JsonTask.read(jsonTask));
+            manager.saveTask(JsonTask.readTask(jsonTask));
             exchange.close();
         }
-    }
-
-    private void taskToJson(Task task) {
-        JsonTask.write(task);
     }
 }
