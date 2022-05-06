@@ -1,3 +1,4 @@
 id,type,name,status,description,epic,startTime,duration
-1,TASK,task1,DONE,testTask1,,0,10
+1,EPIC,task1,DONE,testTask1,,null,null
+2,SUBTASK,task1,DONE,testTask1,1,0,10
 

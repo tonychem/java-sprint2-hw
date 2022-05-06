@@ -49,7 +49,6 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
 
     @Override
     public Task read(JsonReader jsonReader) throws IOException {
-        long id = 0;
         TaskType type = null;
         String name = null;
         Status status = null;
@@ -64,7 +63,7 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
             String fieldName = jsonReader.nextName();
             switch (fieldName) {
                 case "id":
-                    id = jsonReader.nextLong();
+                    jsonReader.nextString(); //пропускаем строку, назначение id делегируется менеджеру
                     break;
                 case "type":
                     type = TaskType.valueOf(jsonReader.nextString());
@@ -96,11 +95,11 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
         switch (type) {
             case TASK:
                 taskToReturn = new Task(name, description, status, startTime, duration);
-                taskToReturn.setId(id);
+
                 break;
             case SUBTASK:
                 taskToReturn = new Subtask(name, description, status, startTime, duration);
-                taskToReturn.setId(id);
+
                 // при десериализации подзадание не знает свои эпики, поэтому присваиваем эпик-заглушку
                 // для сохранения его ID
                 Epic dummy = new Epic(null, null, null);
@@ -109,10 +108,8 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
                 break;
             case EPIC:
                 taskToReturn = new Epic(name, description, new ArrayList<>());
-                taskToReturn.setId(id);
 
                 // Через Reflection API установим приватные поля в эпике
-
                 try {
                     Field statusField = Task.class.getDeclaredField("status");
                     statusField.setAccessible(true);
