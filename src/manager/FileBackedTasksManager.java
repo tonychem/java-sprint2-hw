@@ -165,7 +165,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return listToReturn;
     }
 
-    static FileBackedTasksManager loadFromFile(File file) {
+    public static FileBackedTasksManager loadFromFile(File file) {
         FileBackedTasksManager backUp = new FileBackedTasksManager(file.getPath());
         List<Task> tasks = new ArrayList<>();
         List<Epic> epics = new ArrayList<>();
