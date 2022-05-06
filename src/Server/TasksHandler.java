@@ -1,7 +1,6 @@
 package Server;
 
-import JsonTaskBuilder.JsonTaskIO;
-import com.google.gson.Gson;
+import JsonTaskBuilder.JsonTask;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
@@ -22,21 +21,29 @@ public class TasksHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String requestPath = exchange.getRequestURI().getPath();
+        //если путь содержит только /tasks
         if (requestPath.equals("/tasks/") || requestPath.equals("/tasks")) {
             exchange.sendResponseHeaders(200, 0);
             OutputStream os = exchange.getResponseBody();
             os.write(manager.getPrioritizedTasks().toString().getBytes(StandardCharsets.UTF_8));
             os.close();
+            return;
         }
-
-        if (exchange.getRequestMethod().equals("POST")) {
-            if (requestPath.split("/")[2].equals("task")) {
-                exchange.sendResponseHeaders(201, 0);
-                InputStream is = exchange.getRequestBody();
-                String jsonTask = new String(is.readAllBytes());
-                manager.saveTask(JsonTaskIO.read(jsonTask));
+        // в противном случае анализируем, что следует в пути запроса после /tasks/ и делегируем запрос
+        String[] splitRequestPath = requestPath.split("/");
+        switch (splitRequestPath[2]) {
+            case "task":
+                taskHandler(exchange);
+                break;
+            case "epic":
+                epicHandler(exchange);
+                break;
+            case "subtask":
+                subtaskHandler(exchange);
+                break;
+            default:
+                exchange.sendResponseHeaders(400, 0);
                 exchange.close();
-            }
         }
     }
 
@@ -48,11 +55,17 @@ public class TasksHandler implements HttpHandler {
 
     }
 
-    private void taskHandler(HttpExchange exchange) {
-
+    private void taskHandler(HttpExchange exchange) throws IOException {
+        if (exchange.getRequestMethod().equals("POST")) {
+            exchange.sendResponseHeaders(201, 0);
+            InputStream is = exchange.getRequestBody();
+            String jsonTask = new String(is.readAllBytes());
+            manager.saveTask(JsonTask.read(jsonTask));
+            exchange.close();
+        }
     }
 
     private void taskToJson(Task task) {
-        JsonTaskIO.write(task);
+        JsonTask.write(task);
     }
 }
