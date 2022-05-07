@@ -6,8 +6,8 @@ import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
-/** Утилитный класс, который читает и пишет json-файлы, кастомизированные под TaskManager
- *
+/**
+ * Утилитный класс, который читает и пишет json-файлы, кастомизированные под TaskManager
  */
 public class JsonTask {
 

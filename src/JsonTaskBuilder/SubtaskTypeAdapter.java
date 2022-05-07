@@ -10,35 +10,40 @@ import tasks.Subtask;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 
 public class SubtaskTypeAdapter extends TypeAdapter<Subtask> {
     @Override
     public void write(JsonWriter jsonWriter, Subtask subtask) throws IOException {
         jsonWriter.beginObject();
 
-        jsonWriter.name("id")
-                .value(subtask.getId());
+        jsonWriter.name("id").value(subtask.getId());
 
-        jsonWriter.name("type")
-                .value(subtask.getType().toString());
+        jsonWriter.name("type").value(subtask.getType().toString());
 
-        jsonWriter.name("name")
-                .value(subtask.getTitle());
+        jsonWriter.name("name").value(subtask.getTitle());
 
-        jsonWriter.name("description")
-                .value(subtask.getDescription());
+        jsonWriter.name("description").value(subtask.getDescription());
 
-        jsonWriter.name("status")
-                .value(subtask.getStatus().toString());
+        jsonWriter.name("status").value(subtask.getStatus().toString());
 
-        jsonWriter.name("epic")
-                .value(subtask.getMyEpicReference().getId());
+        jsonWriter.name("epic").value(subtask.getMyEpicReference().getId());
 
-        jsonWriter.name("startTime")
-                .value(subtask.getStartTime().toString());
+        jsonWriter.name("startTime");
 
-        jsonWriter.name("duration")
-                .value(subtask.getDuration().toString());
+        if (subtask.getStartTime() == null) {
+            jsonWriter.value("null");
+        } else {
+            jsonWriter.value(subtask.getStartTime().toString());
+        }
+
+        jsonWriter.name("duration");
+
+        if (subtask.getDuration() == null) {
+            jsonWriter.value("null");
+        } else {
+            jsonWriter.value(subtask.getDuration().toString());
+        }
 
         jsonWriter.endObject();
     }
@@ -46,37 +51,46 @@ public class SubtaskTypeAdapter extends TypeAdapter<Subtask> {
     @Override
     public Subtask read(JsonReader jsonReader) throws IOException {
         Subtask subtask = null;
+        String name = null;
+        String description = null;
+        Status status = Status.NEW;
+        Instant startTime = null;
+        Duration duration = null;
+        long dummyId = 0;
+        Epic dummy = null;
 
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
-            String fieldName = jsonReader.nextName();
-            subtask = new Subtask(null, null);
+            String fieldName = jsonReader.nextName().toLowerCase();
+            dummy = new Epic(null, null, new ArrayList<>());
             switch (fieldName) {
                 case "name":
-                    subtask.setTitle(jsonReader.nextString());
+                    name = jsonReader.nextString();
                     break;
                 case "description":
-                    subtask.setDescription(jsonReader.nextString());
+                    description = jsonReader.nextString();
                     break;
                 case "status":
-                    subtask.setStatus(Status.valueOf(jsonReader.nextString()));
+                    status = Status.valueOf(jsonReader.nextString().toUpperCase());
                     break;
                 case "epic":
-                    // Через эпик-пустышку
-                    Epic dummy = new Epic(null, null, null);
-                    dummy.setId(jsonReader.nextInt());
-                    subtask.setMyEpicReference(dummy);
-                case "startTime":
-                    subtask.setStartTime(Instant.ofEpochMilli(jsonReader.nextLong()));
+                    dummyId = jsonReader.nextLong();
+                    break;
+                case "starttime":
+                    startTime = Instant.ofEpochMilli(jsonReader.nextLong());
                     break;
                 case "duration":
-                    subtask.setDuration(Duration.ofMillis(jsonReader.nextLong()));
+                    duration = Duration.ofMillis(jsonReader.nextLong());
                     break;
                 default:
                     jsonReader.skipValue();
             }
         }
         jsonReader.endObject();
+        subtask = new Subtask(name, description, status, startTime, duration);
+        dummy.setId(dummyId);
+        subtask.setMyEpicReference(dummy);
+
         return subtask;
     }
 }

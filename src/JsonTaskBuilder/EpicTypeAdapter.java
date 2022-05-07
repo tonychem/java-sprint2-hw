@@ -17,29 +17,34 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
     public void write(JsonWriter jsonWriter, Epic epic) throws IOException {
         jsonWriter.beginObject();
 
-        jsonWriter.name("id")
-                .value(epic.getId());
+        jsonWriter.name("id").value(epic.getId());
 
-        jsonWriter.name("type")
-                .value(epic.getType().toString());
+        jsonWriter.name("type").value(epic.getType().toString());
 
-        jsonWriter.name("name")
-                .value(epic.getTitle());
+        jsonWriter.name("name").value(epic.getTitle());
 
-        jsonWriter.name("description")
-                .value(epic.getDescription());
+        jsonWriter.name("description").value(epic.getDescription());
 
-        jsonWriter.name("status")
-                .value(epic.getStatus().toString());
+        jsonWriter.name("status").value(epic.getStatus().toString());
 
         jsonWriter.name("subtasks");
         writeSubtasks(jsonWriter, epic.getMySubtasks());
 
-        jsonWriter.name("startTime")
-                .value(epic.getStartTime().toString());
+        jsonWriter.name("startTime");
 
-        jsonWriter.name("duration")
-                .value(epic.getDuration().toString());
+        if (epic.getStartTime() == null) {
+            jsonWriter.nullValue();
+        } else {
+            jsonWriter.value(epic.getStartTime().toString());
+        }
+
+        jsonWriter.name("duration");
+
+        if (epic.getDuration() == null) {
+            jsonWriter.nullValue();
+        } else {
+            jsonWriter.value(epic.getDuration().toString());
+        }
 
         jsonWriter.endObject();
     }
@@ -48,39 +53,35 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
     public Epic read(JsonReader jsonReader) throws IOException {
         String name = null;
         String description = null;
+        ArrayList<Subtask> subtasks = new ArrayList<>();
         Epic epic = null;
 
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
-            String fieldName = jsonReader.nextName();
-            epic = new Epic(null, null, null);
+            String fieldName = jsonReader.nextName().toLowerCase();
+
             switch (fieldName) {
                 case "name":
                     name = jsonReader.nextString();
-                    epic.setTitle(name);
                     break;
                 case "description":
                     description = jsonReader.nextString();
-                    epic.setDescription(description);
                     break;
                 case "subtasks":
-                    ArrayList<Subtask> subtasks = new ArrayList<>();
-
                     jsonReader.beginArray();
                     while (jsonReader.hasNext()) {
                         subtasks.add(readSubtask(jsonReader));
                     }
                     jsonReader.endArray();
-
-                    epic.setMySubtasks(subtasks);
                     break;
                 default:
                     jsonReader.skipValue();
             }
         }
-
         jsonReader.endObject();
-        return epic.update();
+
+        epic = new Epic(name, description, subtasks).update();
+        return epic;
     }
 
     private void writeSubtasks(JsonWriter writer, ArrayList<Subtask> subtaskList) throws IOException {
@@ -98,7 +99,7 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
 
         reader.beginObject();
         while (reader.hasNext()) {
-            String fieldName = reader.nextName();
+            String fieldName = reader.nextName().toLowerCase();
             subtask = new Subtask(null, null);
             switch (fieldName) {
                 case "name":
@@ -108,12 +109,8 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
                     subtask.setDescription(reader.nextString());
                     break;
                 case "status":
-                    subtask.setStatus(Status.valueOf(reader.nextString()));
+                    subtask.setStatus(Status.valueOf(reader.nextString().toUpperCase()));
                     break;
-                case "epic":
-                    Epic dummy = new Epic(null, null, null);
-                    dummy.setId(reader.nextInt());
-                    subtask.setMyEpicReference(dummy);
                 case "startTime":
                     subtask.setStartTime(Instant.ofEpochMilli(reader.nextLong()));
                     break;
@@ -131,29 +128,33 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
     private void writeSubtask(JsonWriter writer, Subtask subtask) throws IOException {
         writer.beginObject();
 
-        writer.name("id")
-                .value(subtask.getId());
+        writer.name("id").value(subtask.getId());
 
-        writer.name("type")
-                .value(subtask.getType().toString());
+        writer.name("type").value(subtask.getType().toString());
 
-        writer.name("name")
-                .value(subtask.getTitle());
+        writer.name("name").value(subtask.getTitle());
 
-        writer.name("description")
-                .value(subtask.getDescription());
+        writer.name("description").value(subtask.getDescription());
 
-        writer.name("status")
-                .value(subtask.getStatus().toString());
+        writer.name("status").value(subtask.getStatus().toString());
 
-        writer.name("epic")
-                .value(subtask.getMyEpicReference().getId());
+        writer.name("epic").value(subtask.getMyEpicReference().getId());
 
-        writer.name("startTime")
-                .value(subtask.getStartTime().toString());
+        writer.name("startTime");
 
-        writer.name("duration")
-                .value(subtask.getDuration().toString());
+        if (subtask.getStartTime() == null) {
+            writer.nullValue();
+        } else {
+            writer.value(subtask.getStartTime().toString());
+        }
+
+        writer.name("duration");
+
+        if (subtask.getDuration() == null) {
+            writer.nullValue();
+        } else {
+            writer.value(subtask.getDuration().toString());
+        }
 
         writer.endObject();
     }

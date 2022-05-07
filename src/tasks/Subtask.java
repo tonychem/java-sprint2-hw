@@ -8,6 +8,8 @@ public class Subtask extends Task {
 
     private Epic myEpicReference;
 
+    private long epicId;
+
     private static TaskType type = TaskType.SUBTASK;
 
     public Subtask(String title, String description) {
@@ -28,6 +30,11 @@ public class Subtask extends Task {
 
     public void setMyEpicReference(Epic myEpicReference) {
         this.myEpicReference = myEpicReference;
+        epicId = myEpicReference.getId();
+    }
+
+    public long getEpicId() {
+        return epicId;
     }
 
     public Subtask setStatus(Status status) {
@@ -39,6 +46,10 @@ public class Subtask extends Task {
 
     public TaskType getType() {
         return type;
+    }
+
+    public static void setType(TaskType type) {
+        Subtask.type = type;
     }
 
     @Override

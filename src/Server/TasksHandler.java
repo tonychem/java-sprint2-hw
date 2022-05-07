@@ -4,15 +4,19 @@ import JsonTaskBuilder.JsonTask;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
-import tasks.*;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class TasksHandler implements HttpHandler {
     private TaskManager manager;
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public TasksHandler(TaskManager manager) {
         this.manager = manager;
@@ -22,16 +26,30 @@ public class TasksHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         String requestPath = exchange.getRequestURI().getPath();
         //если путь содержит только /tasks
-        if (requestPath.equals("/tasks/") || requestPath.equals("/tasks")) {
+        if (requestPath.equalsIgnoreCase("/tasks/") || requestPath.equalsIgnoreCase("/tasks")) {
             exchange.sendResponseHeaders(200, 0);
             OutputStream os = exchange.getResponseBody();
-            os.write(manager.getPrioritizedTasks().toString().getBytes(StandardCharsets.UTF_8));
+
+            for (Epic e : manager.getAllEpics()) {
+                os.write(JsonTask.writeEpic(e).getBytes(CHARSET));
+                os.write("\n".getBytes(CHARSET));
+            }
+
+            for (Subtask sub : manager.getAllSubtasks()) {
+                os.write(JsonTask.writeSubtask(sub).getBytes(CHARSET));
+                os.write("\n".getBytes(CHARSET));
+            }
+
+            for (Task task : manager.getAllTasks()) {
+                os.write(JsonTask.writeTask(task).getBytes(CHARSET));
+                os.write("\n".getBytes(CHARSET));
+            }
             os.close();
             return;
         }
         // в противном случае анализируем, что следует в пути запроса после /tasks/ и делегируем запрос
         String[] splitRequestPath = requestPath.split("/");
-        switch (splitRequestPath[2]) {
+        switch (splitRequestPath[2].toLowerCase()) {
             case "task":
                 taskHandler(exchange);
                 break;
@@ -52,7 +70,7 @@ public class TasksHandler implements HttpHandler {
             exchange.sendResponseHeaders(201, 0);
             InputStream is = exchange.getRequestBody();
             String jsonTask = new String(is.readAllBytes());
-            manager.saveSubtask( (Subtask) JsonTask.readSubtask(jsonTask));
+            manager.saveSubtask(JsonTask.readSubtask(jsonTask));
             exchange.close();
         }
     }
@@ -62,7 +80,7 @@ public class TasksHandler implements HttpHandler {
             exchange.sendResponseHeaders(201, 0);
             InputStream is = exchange.getRequestBody();
             String jsonTask = new String(is.readAllBytes());
-            manager.saveEpic((Epic) JsonTask.readEpic(jsonTask));
+            manager.saveEpic(JsonTask.readEpic(jsonTask));
             exchange.close();
         }
     }

@@ -3,13 +3,12 @@ package JsonTaskBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import tasks.*;
+import tasks.Status;
+import tasks.Task;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 
 public class TaskTypeAdapter extends TypeAdapter<Task> {
     @Override
@@ -31,11 +30,21 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
         jsonWriter.name("status")
                 .value(task.getStatus().toString());
 
-        jsonWriter.name("startTime")
-                .value(task.getStartTime().toString());
+        jsonWriter.name("startTime");
 
-        jsonWriter.name("duration")
-                .value(task.getDuration().toString());
+        if (task.getStartTime() == null) {
+            jsonWriter.nullValue();
+        } else {
+            jsonWriter.value(task.getStartTime().toString());
+        }
+
+        jsonWriter.name("duration");
+
+        if (task.getDuration() == null) {
+            jsonWriter.nullValue();
+        } else {
+            jsonWriter.value(task.getDuration().toString());
+        }
 
         jsonWriter.endObject();
     }
@@ -43,7 +52,7 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
     @Override
     public Task read(JsonReader jsonReader) throws IOException {
         String name = null;
-        Status status = null;
+        Status status = Status.NEW;
         String description = null;
         Instant startTime = null;
         Duration duration = null;

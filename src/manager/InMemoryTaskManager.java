@@ -135,10 +135,26 @@ public class InMemoryTaskManager implements TaskManager {
         if (sub == null) {
             throw new IllegalArgumentException("попытка записать значение null");
         }
-        if (sub.getMyEpicReference() == null) {
-            throw new IllegalArgumentException("Нельзя передавать подзадачу без эпика");
+
+        if (sub.getMyEpicReference() == null || !epicMap.containsKey(sub.getMyEpicReference().getId())) {
+            throw new IllegalArgumentException("попытка сохранить подзадачу без эпика");
         }
+
+        //Найти эпик с соответствующим id (костыль для эпика-заглушки)
+        Optional<Epic> epicInEpicMap = epicMap.values().parallelStream()
+                .filter(x -> x.getId() == sub.getMyEpicReference().getId())
+                .findAny();
+        Epic epicReference = null;
+
+        if (epicInEpicMap.isPresent() && sub.getMyEpicReference().getTitle() == null && sub.getMyEpicReference().getDescription() == null) {
+            epicReference = epicInEpicMap.get();
+        }
+
         if (!hasIntersection(sub) && !subtaskMap.containsValue(sub)) {
+            if (epicReference != null) {
+                sub.setMyEpicReference(epicReference);
+                epicReference.putSubtask(sub);
+            }
             sub.setId(assignID);
             subtaskMap.put(assignID, sub);
             prioritizedTaskSet.add(sub);
