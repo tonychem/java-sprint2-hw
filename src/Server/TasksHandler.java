@@ -66,32 +66,72 @@ public class TasksHandler implements HttpHandler {
     }
 
     private void subtaskHandler(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestMethod().equals("POST")) {
-            exchange.sendResponseHeaders(201, 0);
-            InputStream is = exchange.getRequestBody();
-            String jsonTask = new String(is.readAllBytes());
-            manager.saveSubtask(JsonTask.readSubtask(jsonTask));
-            exchange.close();
+        String requestMethod = exchange.getRequestMethod();
+
+        switch (requestMethod) {
+            case "GET":
+                exchange.sendResponseHeaders(201, 0);
+                OutputStream os = exchange.getResponseBody();
+
+                for (Subtask sub : manager.getAllSubtasks()) {
+                    os.write(JsonTask.writeSubtask(sub).getBytes(CHARSET));
+                }
+                os.close();
+                return;
+            case "POST":
+                exchange.sendResponseHeaders(201, 0);
+                InputStream is = exchange.getRequestBody();
+                String jsonTask = new String(is.readAllBytes());
+                manager.saveSubtask(JsonTask.readSubtask(jsonTask));
+                exchange.close();
+                return;
         }
     }
 
     private void epicHandler(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestMethod().equals("POST")) {
-            exchange.sendResponseHeaders(201, 0);
-            InputStream is = exchange.getRequestBody();
-            String jsonTask = new String(is.readAllBytes());
-            manager.saveEpic(JsonTask.readEpic(jsonTask));
-            exchange.close();
+        String requestMethod = exchange.getRequestMethod();
+
+        switch (requestMethod) {
+            case "GET":
+                exchange.sendResponseHeaders(201, 0);
+                OutputStream os = exchange.getResponseBody();
+
+                for (Epic e : manager.getAllEpics()) {
+                    os.write(JsonTask.writeEpic(e).getBytes(CHARSET));
+                }
+                os.close();
+                return;
+            case "POST":
+                exchange.sendResponseHeaders(201, 0);
+                InputStream is = exchange.getRequestBody();
+                String jsonTask = new String(is.readAllBytes());
+                manager.saveEpic(JsonTask.readEpic(jsonTask));
+                exchange.close();
+                return;
         }
     }
 
     private void taskHandler(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestMethod().equals("POST")) {
-            exchange.sendResponseHeaders(201, 0);
-            InputStream is = exchange.getRequestBody();
-            String jsonTask = new String(is.readAllBytes());
-            manager.saveTask(JsonTask.readTask(jsonTask));
-            exchange.close();
+        String requestMethod = exchange.getRequestMethod();
+
+        switch (requestMethod) {
+            case "GET":
+                exchange.sendResponseHeaders(201, 0);
+                OutputStream os = exchange.getResponseBody();
+
+                for (Task task : manager.getAllTasks()) {
+                    os.write(JsonTask.writeTask(task).getBytes(CHARSET));
+                }
+                os.close();
+                return;
+            case "POST":
+                exchange.sendResponseHeaders(201, 0);
+                InputStream is = exchange.getRequestBody();
+                String jsonTask = new String(is.readAllBytes());
+                manager.saveTask(JsonTask.readTask(jsonTask));
+                exchange.close();
+                return;
         }
+
     }
 }
