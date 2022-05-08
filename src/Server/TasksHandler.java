@@ -34,13 +34,10 @@ public class TasksHandler implements HttpHandler {
             for (Task t : manager.getPrioritizedTasks()) {
                 if (t.getType() == TaskType.TASK) {
                     os.write((JsonTask.writeTask(t) + "\n").getBytes(CHARSET));
-                } else if (t.getType() == TaskType.EPIC) {
-                    os.write((JsonTask.writeEpic((Epic) t) + "\n").getBytes(CHARSET));
                 } else {
-                    os.write((JsonTask.writeSubtask((Subtask) t)).getBytes(CHARSET));
+                    os.write((JsonTask.writeEpic((Epic) t) + "\n").getBytes(CHARSET));
                 }
             }
-
             os.close();
             return;
         }
@@ -75,7 +72,7 @@ public class TasksHandler implements HttpHandler {
                     OutputStream os = exchange.getResponseBody();
 
                     for (Subtask sub : manager.getAllSubtasks()) {
-                        os.write(JsonTask.writeSubtask(sub).getBytes(CHARSET));
+                        os.write((JsonTask.writeSubtask(sub) + "\n").getBytes(CHARSET));
                     }
                     os.close();
 
@@ -86,6 +83,7 @@ public class TasksHandler implements HttpHandler {
                     try {
                         id = Long.parseLong(queryString.split("id=")[1]);
                     } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.sendResponseHeaders(400, 0);
                         exchange.close();
                         return;
                     }
@@ -110,6 +108,27 @@ public class TasksHandler implements HttpHandler {
                 manager.saveSubtask(JsonTask.readSubtask(jsonTask));
                 exchange.close();
                 return;
+
+            case "DELETE":
+                if (queryString == null) {
+                    exchange.sendResponseHeaders(200, 0);
+                    manager.eraseSubtasks();
+                } else {
+                    long id;
+                    //если в параметр запроса передан пустой id или нечисловое значение
+                    try {
+                        id = Long.parseLong(queryString.split("id=")[1]);
+                    } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.sendResponseHeaders(400, 0);
+                        exchange.close();
+                        return;
+                    }
+
+                    manager.removeSubtask(id);
+                    exchange.sendResponseHeaders(200, 0);
+                }
+                exchange.close();
+                return;
         }
     }
 
@@ -124,7 +143,7 @@ public class TasksHandler implements HttpHandler {
                     OutputStream os = exchange.getResponseBody();
 
                     for (Epic e : manager.getAllEpics()) {
-                        os.write(JsonTask.writeEpic(e).getBytes(CHARSET));
+                        os.write((JsonTask.writeEpic(e) + "\n").getBytes(CHARSET));
                     }
                     os.close();
                 } else {
@@ -133,6 +152,7 @@ public class TasksHandler implements HttpHandler {
                     try {
                         id = Long.parseLong(queryString.split("id=")[1]);
                     } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.sendResponseHeaders(400 ,0);
                         exchange.close();
                         return;
                     }
@@ -156,6 +176,27 @@ public class TasksHandler implements HttpHandler {
                 manager.saveEpic(JsonTask.readEpic(jsonTask));
                 exchange.close();
                 return;
+
+            case "DELETE":
+                if (queryString == null) {
+                    exchange.sendResponseHeaders(200, 0);
+                    manager.eraseEpics();
+                } else {
+                    long id;
+                    //если в параметр запроса передан пустой id или нечисловое значение
+                    try {
+                        id = Long.parseLong(queryString.split("id=")[1]);
+                    } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.sendResponseHeaders(400, 0);
+                        exchange.close();
+                        return;
+                    }
+
+                    manager.removeEpic(id);
+                    exchange.sendResponseHeaders(200, 0);
+                }
+                exchange.close();
+                return;
         }
     }
 
@@ -170,7 +211,7 @@ public class TasksHandler implements HttpHandler {
                     OutputStream os = exchange.getResponseBody();
 
                     for (Task task : manager.getAllTasks()) {
-                        os.write(JsonTask.writeTask(task).getBytes(CHARSET));
+                        os.write((JsonTask.writeTask(task) + "\n").getBytes(CHARSET));
                     }
                     os.close();
                 } else {
@@ -179,6 +220,7 @@ public class TasksHandler implements HttpHandler {
                     try {
                         id = Long.parseLong(queryString.split("id=")[1]);
                     } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.sendResponseHeaders(400, 0);
                         exchange.close();
                         return;
                     }
@@ -201,6 +243,25 @@ public class TasksHandler implements HttpHandler {
                 InputStream is = exchange.getRequestBody();
                 String jsonTask = new String(is.readAllBytes());
                 manager.saveTask(JsonTask.readTask(jsonTask));
+                exchange.close();
+                return;
+            case "DELETE":
+                if (queryString == null) {
+                    exchange.sendResponseHeaders(200, 0);
+                    manager.eraseTasks();
+                } else {
+                    long id;
+                    //если в параметр запроса передан пустой id или нечисловое значение
+                    try {
+                        id = Long.parseLong(queryString.split("id=")[1]);
+                    } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.close();
+                        return;
+                    }
+
+                    manager.removeTask(id);
+                    exchange.sendResponseHeaders(200, 0);
+                }
                 exchange.close();
                 return;
         }
