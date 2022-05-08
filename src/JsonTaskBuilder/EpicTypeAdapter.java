@@ -111,7 +111,7 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
                 case "status":
                     subtask.setStatus(Status.valueOf(reader.nextString().toUpperCase()));
                     break;
-                case "startTime":
+                case "starttime":
                     subtask.setStartTime(Instant.ofEpochMilli(reader.nextLong()));
                     break;
                 case "duration":
