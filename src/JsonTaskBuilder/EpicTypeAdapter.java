@@ -35,7 +35,7 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
         if (epic.getStartTime() == null) {
             jsonWriter.nullValue();
         } else {
-            jsonWriter.value(epic.getStartTime().toString());
+            jsonWriter.value(epic.getStartTime().toEpochMilli());
         }
 
         jsonWriter.name("duration");
@@ -43,7 +43,7 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
         if (epic.getDuration() == null) {
             jsonWriter.nullValue();
         } else {
-            jsonWriter.value(epic.getDuration().toString());
+            jsonWriter.value(epic.getDuration().toMillis());
         }
 
         jsonWriter.endObject();
@@ -145,7 +145,7 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
         if (subtask.getStartTime() == null) {
             writer.nullValue();
         } else {
-            writer.value(subtask.getStartTime().toString());
+            writer.value(subtask.getStartTime().toEpochMilli());
         }
 
         writer.name("duration");
@@ -153,7 +153,7 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
         if (subtask.getDuration() == null) {
             writer.nullValue();
         } else {
-            writer.value(subtask.getDuration().toString());
+            writer.value(subtask.getDuration().toMillis());
         }
 
         writer.endObject();

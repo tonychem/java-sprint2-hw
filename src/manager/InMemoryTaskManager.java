@@ -6,10 +6,7 @@ import tasks.Task;
 import tasks.TaskType;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.Comparator.*;
 
@@ -17,7 +14,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Long, Task> taskMap;
     private final HashMap<Long, Epic> epicMap;
     private final HashMap<Long, Subtask> subtaskMap;
-    private final TreeSet<Task> prioritizedTaskSet = new TreeSet(comparing(Task::getStartTime, nullsLast(naturalOrder())));
+    private final TreeSet<Task> prioritizedTaskSet = new TreeSet(new TaskTemporalComparator());
     private final HistoryManager historyManager;
     public long assignID;
 
@@ -256,5 +253,26 @@ public class InMemoryTaskManager implements TaskManager {
             out += sub.toString() + "\n";
         }
         return out;
+    }
+}
+
+class TaskTemporalComparator implements Comparator<Task> {
+    @Override
+    public int compare(Task task1, Task task2) {
+        Instant task1StartTime = task1.getStartTime();
+        Instant task2StartTime = task2.getStartTime();
+
+        if (task1StartTime == null && task2StartTime == null) {
+            return 0;
+        }
+
+        if (task1StartTime != null && task2StartTime == null) {
+            return -1;
+        }
+
+        if (task1StartTime == null) {
+            return 1;
+        }
+        return task1StartTime.compareTo(task2StartTime);
     }
 }

@@ -35,7 +35,7 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
         if (task.getStartTime() == null) {
             jsonWriter.nullValue();
         } else {
-            jsonWriter.value(task.getStartTime().toString());
+            jsonWriter.value(task.getStartTime().toEpochMilli());
         }
 
         jsonWriter.name("duration");
@@ -43,7 +43,7 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
         if (task.getDuration() == null) {
             jsonWriter.nullValue();
         } else {
-            jsonWriter.value(task.getDuration().toString());
+            jsonWriter.value(task.getDuration().toMillis());
         }
 
         jsonWriter.endObject();

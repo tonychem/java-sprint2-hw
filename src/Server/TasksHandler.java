@@ -7,6 +7,7 @@ import manager.TaskManager;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
+import tasks.TaskType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,20 +31,16 @@ public class TasksHandler implements HttpHandler {
             exchange.sendResponseHeaders(200, 0);
             OutputStream os = exchange.getResponseBody();
 
-            for (Epic e : manager.getAllEpics()) {
-                os.write(JsonTask.writeEpic(e).getBytes(CHARSET));
-                os.write("\n".getBytes(CHARSET));
+            for (Task t: manager.getPrioritizedTasks()) {
+                if (t.getType() == TaskType.TASK) {
+                    os.write((JsonTask.writeTask(t) + "\n").getBytes(CHARSET));
+                } else if (t.getType() == TaskType.EPIC) {
+                    os.write((JsonTask.writeEpic((Epic) t) + "\n").getBytes(CHARSET));
+                } else {
+                    os.write((JsonTask.writeSubtask((Subtask) t)).getBytes(CHARSET));
+                }
             }
 
-            for (Subtask sub : manager.getAllSubtasks()) {
-                os.write(JsonTask.writeSubtask(sub).getBytes(CHARSET));
-                os.write("\n".getBytes(CHARSET));
-            }
-
-            for (Task task : manager.getAllTasks()) {
-                os.write(JsonTask.writeTask(task).getBytes(CHARSET));
-                os.write("\n".getBytes(CHARSET));
-            }
             os.close();
             return;
         }

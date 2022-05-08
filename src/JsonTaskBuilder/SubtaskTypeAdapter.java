@@ -32,17 +32,17 @@ public class SubtaskTypeAdapter extends TypeAdapter<Subtask> {
         jsonWriter.name("startTime");
 
         if (subtask.getStartTime() == null) {
-            jsonWriter.value("null");
+            jsonWriter.nullValue();
         } else {
-            jsonWriter.value(subtask.getStartTime().toString());
+            jsonWriter.value(subtask.getStartTime().toEpochMilli());
         }
 
         jsonWriter.name("duration");
 
         if (subtask.getDuration() == null) {
-            jsonWriter.value("null");
+            jsonWriter.nullValue();
         } else {
-            jsonWriter.value(subtask.getDuration().toString());
+            jsonWriter.value(subtask.getDuration().toMillis());
         }
 
         jsonWriter.endObject();
