@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class TasksHandler implements HttpHandler {
     private final TaskManager manager;
@@ -40,6 +41,7 @@ public class TasksHandler implements HttpHandler {
             }
             os.close();
             return;
+
         } else if (requestPath.endsWith("/tasks/history")) {
             exchange.sendResponseHeaders(200, 0);
             OutputStream os = exchange.getResponseBody();
@@ -90,8 +92,7 @@ public class TasksHandler implements HttpHandler {
                     }
                     os.close();
 
-                    //если параметр запроса содержит id, вернуть сабтаск с заданным id
-                } else {
+                } else if (!exchange.getRequestURI().getPath().contains("subtask/epic")) {
                     long id;
                     //если в параметр запроса передан пустой id или нечисловое значение
                     try {
@@ -111,6 +112,32 @@ public class TasksHandler implements HttpHandler {
                         OutputStream os = exchange.getResponseBody();
                         os.write(JsonTask.writeSubtask(subtask).getBytes(CHARSET));
                         os.close();
+                    }
+                } else {
+                    long id;
+                    //если в параметр запроса передан пустой id или нечисловое значение
+                    try {
+                        id = Long.parseLong(queryString.split("id=")[1]);
+                    } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.sendResponseHeaders(400, 0);
+                        exchange.close();
+                        return;
+                    }
+
+                    Optional<Epic> epicOptional = manager.getAllEpics().parallelStream()
+                            .filter(x -> x.getId() == id)
+                            .findAny();
+
+                    if (epicOptional.isPresent()) {
+                        OutputStream os = exchange.getResponseBody();
+
+                        for (Subtask subtask : epicOptional.get().getMySubtasks()) {
+                            os.write((JsonTask.writeSubtask(subtask) + "\n").getBytes(CHARSET));
+                        }
+                        os.close();
+                    } else {
+                        exchange.sendResponseHeaders(400, 0);
+                        exchange.close();
                     }
                 }
                 return;
@@ -183,6 +210,7 @@ public class TasksHandler implements HttpHandler {
                     }
                 }
                 return;
+
             case "POST":
                 exchange.sendResponseHeaders(201, 0);
                 InputStream is = exchange.getRequestBody();
@@ -259,6 +287,7 @@ public class TasksHandler implements HttpHandler {
                 manager.saveTask(JsonTask.readTask(jsonTask));
                 exchange.close();
                 return;
+
             case "DELETE":
                 if (queryString == null) {
                     exchange.sendResponseHeaders(200, 0);
@@ -279,6 +308,5 @@ public class TasksHandler implements HttpHandler {
                 exchange.close();
                 return;
         }
-
     }
 }
