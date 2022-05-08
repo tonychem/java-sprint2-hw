@@ -16,7 +16,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class TasksHandler implements HttpHandler {
-    private TaskManager manager;
+    private final TaskManager manager;
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public TasksHandler(TaskManager manager) {
@@ -31,7 +31,7 @@ public class TasksHandler implements HttpHandler {
             exchange.sendResponseHeaders(200, 0);
             OutputStream os = exchange.getResponseBody();
 
-            for (Task t: manager.getPrioritizedTasks()) {
+            for (Task t : manager.getPrioritizedTasks()) {
                 if (t.getType() == TaskType.TASK) {
                     os.write((JsonTask.writeTask(t) + "\n").getBytes(CHARSET));
                 } else if (t.getType() == TaskType.EPIC) {
@@ -59,22 +59,50 @@ public class TasksHandler implements HttpHandler {
             default:
                 exchange.sendResponseHeaders(400, 0);
                 exchange.close();
+                return;
         }
     }
 
     private void subtaskHandler(HttpExchange exchange) throws IOException {
         String requestMethod = exchange.getRequestMethod();
+        String queryString = exchange.getRequestURI().getQuery();
 
         switch (requestMethod) {
             case "GET":
-                exchange.sendResponseHeaders(201, 0);
-                OutputStream os = exchange.getResponseBody();
+                exchange.sendResponseHeaders(200, 0);
+                //если параметр запроса пуст - вернуть все субтаски
+                if (queryString.isBlank()) {
+                    OutputStream os = exchange.getResponseBody();
 
-                for (Subtask sub : manager.getAllSubtasks()) {
-                    os.write(JsonTask.writeSubtask(sub).getBytes(CHARSET));
+                    for (Subtask sub : manager.getAllSubtasks()) {
+                        os.write(JsonTask.writeSubtask(sub).getBytes(CHARSET));
+                    }
+                    os.close();
+
+                    //если параметр запроса содержит id, вернуть сабтаск с заданным id
+                } else {
+                    long id;
+                    //если в параметр запроса передан пустой id или нечисловое значение
+                    try {
+                        id = Long.parseLong(queryString.split("id=")[1]);
+                    } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.close();
+                        return;
+                    }
+
+                    Subtask subtask = (Subtask) manager.getTaskByID(id);
+                    if (subtask == null) {
+                        exchange.sendResponseHeaders(400, 0);
+                        exchange.close();
+                        return;
+                    } else {
+                        OutputStream os = exchange.getResponseBody();
+                        os.write(JsonTask.writeSubtask(subtask).getBytes(CHARSET));
+                        os.close();
+                    }
                 }
-                os.close();
                 return;
+
             case "POST":
                 exchange.sendResponseHeaders(201, 0);
                 InputStream is = exchange.getRequestBody();
@@ -87,16 +115,39 @@ public class TasksHandler implements HttpHandler {
 
     private void epicHandler(HttpExchange exchange) throws IOException {
         String requestMethod = exchange.getRequestMethod();
+        String queryString = exchange.getRequestURI().getQuery();
 
         switch (requestMethod) {
             case "GET":
-                exchange.sendResponseHeaders(201, 0);
-                OutputStream os = exchange.getResponseBody();
+                exchange.sendResponseHeaders(200, 0);
+                if (queryString.isBlank()) {
+                    OutputStream os = exchange.getResponseBody();
 
-                for (Epic e : manager.getAllEpics()) {
-                    os.write(JsonTask.writeEpic(e).getBytes(CHARSET));
+                    for (Epic e : manager.getAllEpics()) {
+                        os.write(JsonTask.writeEpic(e).getBytes(CHARSET));
+                    }
+                    os.close();
+                } else {
+                    long id;
+
+                    try {
+                        id = Long.parseLong(queryString.split("id=")[1]);
+                    } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.close();
+                        return;
+                    }
+
+                    Epic epic = (Epic) manager.getTaskByID(id);
+                    if (epic == null) {
+                        exchange.sendResponseHeaders(400, 0);
+                        exchange.close();
+                        return;
+                    } else {
+                        OutputStream os = exchange.getResponseBody();
+                        os.write(JsonTask.writeEpic(epic).getBytes(CHARSET));
+                        os.close();
+                    }
                 }
-                os.close();
                 return;
             case "POST":
                 exchange.sendResponseHeaders(201, 0);
@@ -110,17 +161,41 @@ public class TasksHandler implements HttpHandler {
 
     private void taskHandler(HttpExchange exchange) throws IOException {
         String requestMethod = exchange.getRequestMethod();
+        String queryString = exchange.getRequestURI().getQuery();
 
         switch (requestMethod) {
             case "GET":
-                exchange.sendResponseHeaders(201, 0);
-                OutputStream os = exchange.getResponseBody();
+                exchange.sendResponseHeaders(200, 0);
+                if (queryString.isBlank()) {
+                    OutputStream os = exchange.getResponseBody();
 
-                for (Task task : manager.getAllTasks()) {
-                    os.write(JsonTask.writeTask(task).getBytes(CHARSET));
+                    for (Task task : manager.getAllTasks()) {
+                        os.write(JsonTask.writeTask(task).getBytes(CHARSET));
+                    }
+                    os.close();
+                } else {
+                    long id;
+
+                    try {
+                        id = Long.parseLong(queryString.split("id=")[1]);
+                    } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                        exchange.close();
+                        return;
+                    }
+
+                    Task task = manager.getTaskByID(id);
+                    if (task == null) {
+                        exchange.sendResponseHeaders(400, 0);
+                        exchange.close();
+                        return;
+                    } else {
+                        OutputStream os = exchange.getResponseBody();
+                        os.write(JsonTask.writeTask(task).getBytes(CHARSET));
+                        os.close();
+                    }
                 }
-                os.close();
                 return;
+
             case "POST":
                 exchange.sendResponseHeaders(201, 0);
                 InputStream is = exchange.getRequestBody();
