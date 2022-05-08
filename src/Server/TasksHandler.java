@@ -71,7 +71,7 @@ public class TasksHandler implements HttpHandler {
             case "GET":
                 exchange.sendResponseHeaders(200, 0);
                 //если параметр запроса пуст - вернуть все субтаски
-                if (queryString.isBlank()) {
+                if (queryString == null) {
                     OutputStream os = exchange.getResponseBody();
 
                     for (Subtask sub : manager.getAllSubtasks()) {
@@ -120,7 +120,7 @@ public class TasksHandler implements HttpHandler {
         switch (requestMethod) {
             case "GET":
                 exchange.sendResponseHeaders(200, 0);
-                if (queryString.isBlank()) {
+                if (queryString == null) {
                     OutputStream os = exchange.getResponseBody();
 
                     for (Epic e : manager.getAllEpics()) {
@@ -166,7 +166,7 @@ public class TasksHandler implements HttpHandler {
         switch (requestMethod) {
             case "GET":
                 exchange.sendResponseHeaders(200, 0);
-                if (queryString.isBlank()) {
+                if (queryString == null) {
                     OutputStream os = exchange.getResponseBody();
 
                     for (Task task : manager.getAllTasks()) {
