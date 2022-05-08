@@ -13,20 +13,22 @@ public class HttpTaskServer {
     private HttpServer server;
     private String path;
     private TaskManager manager;
+    private final static String HTTP_MANAGER_SERVER_URL = "http://localhost:8078";
 
-    public HttpTaskServer() throws IOException {
+    public HttpTaskServer() throws IOException, InterruptedException {
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
         //Работа с HttpTaskServer идет во временный файл, удаляемый по окончании работы
         path = System.getProperty("user.dir") + "\\src\\Server";
         File temporaryFileForStorage = File.createTempFile("TaskManagerFile", ".csv", new File(path));
         temporaryFileForStorage.deleteOnExit();
-        manager = Managers.getFileBackedTasksManager(temporaryFileForStorage.getAbsolutePath());
+        manager = Managers.getDefault(HTTP_MANAGER_SERVER_URL);
     }
 
     public static void main(String[] args) {
         try {
+            new KVServer().start();
             new HttpTaskServer().start();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

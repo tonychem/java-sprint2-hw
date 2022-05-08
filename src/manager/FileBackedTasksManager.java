@@ -12,36 +12,7 @@ import java.util.List;
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private String pathToFile;
-
-    public static void main(String[] args) {
-        final String outputFilePath = "src/files/output.csv";
-        final String inputFilePath = "src/files/input.csv";
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(outputFilePath);
-        ArrayList<Subtask> subtasksOfEpic1 = new ArrayList<>();
-        Subtask subtask1OfEpic1 = new Subtask("Подзадание 1", "оп1");
-        subtask1OfEpic1.setStartTime(Instant.ofEpochMilli(10_000_000));
-        subtask1OfEpic1.setDuration(Duration.ofMillis(100_000));
-        subtasksOfEpic1.add(subtask1OfEpic1);
-        Subtask subtask2OfEpic1 = new Subtask("Подзадание 2", "оп2", Status.IN_PROGRESS);
-        subtask2OfEpic1.setStartTime(Instant.ofEpochMilli(1_000_000));
-        subtask2OfEpic1.setDuration(Duration.ofMillis(1_000_000));
-        subtasksOfEpic1.add(subtask2OfEpic1);
-
-        Epic epic1 = new Epic("Эпик1", "2 задачи", subtasksOfEpic1);
-        Epic epic2 = new Epic("Эпик2", "Пустой", new ArrayList<>());
-
-        fileBackedTasksManager.saveEpic(epic1);
-        fileBackedTasksManager.saveEpic(epic2);
-
-        fileBackedTasksManager.getTaskByID(1);
-        fileBackedTasksManager.getTaskByID(4);
-        System.out.printf("*запись TaskManager в файл %s завершена*%n", outputFilePath);
-
-        FileBackedTasksManager readFromFile = FileBackedTasksManager.loadFromFile(new File(inputFilePath));
-        System.out.printf("Восстановленный из файла TaskManager: %n%s%nИ его история:%n%s", readFromFile,
-                readFromFile.getHistoryManager().getHistory());
-    }
-
+    
     protected FileBackedTasksManager() {
         super();
         pathToFile = System.getProperty("user.dir") + "\\files\\defaultFileManagerOutput.csv";
