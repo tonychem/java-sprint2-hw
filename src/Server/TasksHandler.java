@@ -40,6 +40,20 @@ public class TasksHandler implements HttpHandler {
             }
             os.close();
             return;
+        } else if (requestPath.endsWith("/tasks/history")) {
+            exchange.sendResponseHeaders(200, 0);
+            OutputStream os = exchange.getResponseBody();
+            for (Task t : manager.getHistoryManager().getHistory()) {
+                if (t.getType() == TaskType.TASK) {
+                    os.write((JsonTask.writeTask(t) + "\n").getBytes(CHARSET));
+                } else if (t.getType() == TaskType.EPIC) {
+                    os.write((JsonTask.writeEpic((Epic) t) + "\n").getBytes(CHARSET));
+                } else {
+                    os.write((JsonTask.writeSubtask((Subtask) t) + "\n").getBytes(CHARSET));
+                }
+            }
+            os.close();
+            return;
         }
         // в противном случае анализируем, что следует в пути запроса после /tasks/ и делегируем запрос
         String[] splitRequestPath = requestPath.split("/");
