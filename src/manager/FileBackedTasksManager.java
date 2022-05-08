@@ -42,13 +42,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 readFromFile.getHistoryManager().getHistory());
     }
 
+    protected FileBackedTasksManager() {
+        super();
+        pathToFile = System.getProperty("user.dir") + "\\files\\defaultFileManagerOutput.csv";
+    }
+
     public FileBackedTasksManager(String pathToFile) {
         super();
         this.pathToFile = pathToFile;
     }
 
 
-    private void save() {
+    protected void save() {
         StringBuilder toFileString = new StringBuilder("id,type,name,status,description,epic,startTime,duration\n");
         File outputFile = new File(pathToFile);
 

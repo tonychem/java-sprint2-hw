@@ -33,10 +33,12 @@ public class TasksHandler implements HttpHandler {
             OutputStream os = exchange.getResponseBody();
 
             for (Task t : manager.getPrioritizedTasks()) {
-                if (t.getType() == TaskType.TASK) {
-                    os.write((JsonTask.writeTask(t) + "\n").getBytes(CHARSET));
-                } else {
+                if (t.getType() == TaskType.EPIC) {
                     os.write((JsonTask.writeEpic((Epic) t) + "\n").getBytes(CHARSET));
+                } else if ((t.getType() == TaskType.TASK)) {
+                    os.write((JsonTask.writeSubtask((Subtask) t) + "\n").getBytes(CHARSET));
+                } else {
+                    os.write((JsonTask.writeTask(t) + "\n").getBytes(CHARSET));
                 }
             }
             os.close();
@@ -193,7 +195,7 @@ public class TasksHandler implements HttpHandler {
                     try {
                         id = Long.parseLong(queryString.split("id=")[1]);
                     } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-                        exchange.sendResponseHeaders(400 ,0);
+                        exchange.sendResponseHeaders(400, 0);
                         exchange.close();
                         return;
                     }

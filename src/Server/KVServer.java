@@ -15,10 +15,6 @@ public class KVServer {
     private HttpServer server;
     private Map<String, String> data = new HashMap<>();
 
-    public static void main(String[] args) throws IOException {
-        new KVServer().start();
-    }
-
     public KVServer() throws IOException {
         API_KEY = generateApiKey();
         server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);

@@ -8,8 +8,6 @@ import tasks.TaskType;
 import java.time.Instant;
 import java.util.*;
 
-import static java.util.Comparator.*;
-
 public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Long, Task> taskMap;
     private final HashMap<Long, Epic> epicMap;
@@ -114,6 +112,7 @@ public class InMemoryTaskManager implements TaskManager {
                 if (!subtaskMap.containsValue(sub)) {
                     sub.setId(assignID);
                     sub.setMyEpicReference(epic);
+                    prioritizedTaskSet.add(sub);
                     subtaskMap.put(assignID, sub);
                     assignID++;
                 }
@@ -138,9 +137,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         //Найти эпик с соответствующим id (костыль для эпика-заглушки)
-        Optional<Epic> epicInEpicMap = epicMap.values().parallelStream()
-                .filter(x -> x.getId() == sub.getMyEpicReference().getId())
-                .findAny();
+        Optional<Epic> epicInEpicMap = epicMap.values().parallelStream().filter(x -> x.getId() == sub.getMyEpicReference().getId()).findAny();
         Epic epicReference = null;
 
         if (epicInEpicMap.isPresent() && sub.getMyEpicReference().getTitle() == null && sub.getMyEpicReference().getDescription() == null) {
@@ -263,7 +260,7 @@ class TaskTemporalComparator implements Comparator<Task> {
         Instant task2StartTime = task2.getStartTime();
 
         if (task1StartTime == null && task2StartTime == null) {
-            return 0;
+            return 1;
         }
 
         if (task1StartTime != null && task2StartTime == null) {
