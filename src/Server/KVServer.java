@@ -103,6 +103,10 @@ public class KVServer {
         server.start();
     }
 
+    public void stop() {
+        server.stop(1);
+    }
+
     private String generateApiKey() {
         return "" + System.currentTimeMillis();
     }

@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpServer;
 import manager.Managers;
 import manager.TaskManager;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
@@ -17,10 +16,6 @@ public class HttpTaskServer {
 
     public HttpTaskServer() throws IOException, InterruptedException {
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
-        //Работа с HttpTaskServer идет во временный файл, удаляемый по окончании работы
-        path = System.getProperty("user.dir") + "\\src\\Server";
-        File temporaryFileForStorage = File.createTempFile("TaskManagerFile", ".csv", new File(path));
-        temporaryFileForStorage.deleteOnExit();
         manager = Managers.getDefault(HTTP_MANAGER_SERVER_URL);
     }
 
@@ -36,5 +31,9 @@ public class HttpTaskServer {
     public void start() {
         server.createContext("/tasks", new TasksHandler(manager));
         server.start();
+    }
+
+    public void stop() {
+        server.stop(1);
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private String pathToFile;
-    
+
     protected FileBackedTasksManager() {
         super();
         pathToFile = System.getProperty("user.dir") + "\\files\\defaultFileManagerOutput.csv";
@@ -22,7 +22,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         super();
         this.pathToFile = pathToFile;
     }
-
 
     protected void save() {
         StringBuilder toFileString = new StringBuilder("id,type,name,status,description,epic,startTime,duration\n");
