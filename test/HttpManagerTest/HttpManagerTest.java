@@ -58,11 +58,11 @@ public class HttpManagerTest {
         }
     }
 
-//    @AfterEach
-//    public void terminate() {
-//        httpTaskServer.stop();
-//        kvServer.stop();
-//    }
+    @AfterEach
+    public void terminate() {
+        httpTaskServer.stop();
+        kvServer.stop();
+    }
 
     @Test
     //TODO wont work
