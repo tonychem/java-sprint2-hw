@@ -109,13 +109,13 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
             subtask = new Subtask(null, null);
             switch (fieldName) {
                 case "name":
-                   title = reader.nextString();
+                    title = reader.nextString();
                     break;
                 case "description":
                     description = reader.nextString();
                     break;
                 case "status":
-                   status = Status.valueOf(reader.nextString().toUpperCase());
+                    status = Status.valueOf(reader.nextString().toUpperCase());
                     break;
                 case "starttime":
                     if (!reader.peek().equals(JsonToken.NULL)) {
@@ -126,7 +126,7 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
                     break;
                 case "duration":
                     if (!reader.peek().equals(JsonToken.NULL)) {
-                       duration = Duration.ofMillis(reader.nextLong());
+                        duration = Duration.ofMillis(reader.nextLong());
                     } else {
                         reader.skipValue();
                     }

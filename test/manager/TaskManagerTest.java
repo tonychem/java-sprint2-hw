@@ -317,7 +317,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         manager.saveTask(t3); //id6
 
         Assertions.assertEquals(t2, manager.getPrioritizedTasks().first());
-        Assertions.assertEquals(4, manager.getPrioritizedTasks().size());
+        Assertions.assertEquals(6, manager.getPrioritizedTasks().size());
 
         manager.eraseEpics();
         Assertions.assertEquals(3, manager.getPrioritizedTasks().size());
