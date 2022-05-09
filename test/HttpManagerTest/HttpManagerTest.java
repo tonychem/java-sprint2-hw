@@ -58,11 +58,11 @@ public class HttpManagerTest {
         }
     }
 
-    @AfterEach
-    public void terminate() {
-        httpTaskServer.stop();
-        kvServer.stop();
-    }
+//    @AfterEach
+//    public void terminate() {
+//        httpTaskServer.stop();
+//        kvServer.stop();
+//    }
 
     @Test
     //TODO wont work
@@ -96,12 +96,25 @@ public class HttpManagerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(epicWithSubtasksJson))
                 .build();
-        System.out.println(epicWithSubtasksJson);
-        JsonTask.readEpic(epicWithSubtasksJson);
+
         // публикуем задания в HttpTaskManager-e
         httpClient.send(requestToPublishTask1Json, HttpResponse.BodyHandlers.ofString());
         httpClient.send(requestToPublishEpicEmptyJson, HttpResponse.BodyHandlers.ofString());
         httpClient.send(requestToPublishEpicWithSubtasksJson, HttpResponse.BodyHandlers.ofString());
+
+        // формируем несколько запросов на получение заданий
+        URI URIGetEpicWithSubtasks = URI.create("http://localhost:8078/load/" + "0" + "?API_KEY=DEBUG");
+        HttpRequest requestToGetEpicWithSubtasksJson = HttpRequest.newBuilder()
+                .uri(URIGetEpicWithSubtasks)
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpResponse<String> responseTask1 = httpClient.send(requestToGetEpicWithSubtasksJson,
+                HttpResponse.BodyHandlers.ofString());
+        System.out.println(epicWithSubtasksJson);
+        System.out.println(responseTask1.body());
+        Assertions.assertTrue("epicWithSubtasks".equals(JsonTask.readEpic(responseTask1.body()).getTitle()));
     }
 
 }

@@ -97,6 +97,11 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
 
     private Subtask readSubtask(JsonReader reader) throws IOException {
         Subtask subtask = null;
+        String title = null;
+        String description = null;
+        Status status = Status.NEW;
+        Instant startTime = null;
+        Duration duration = null;
 
         reader.beginObject();
         while (reader.hasNext()) {
@@ -104,24 +109,24 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
             subtask = new Subtask(null, null);
             switch (fieldName) {
                 case "name":
-                    subtask.setTitle(reader.nextString());
+                   title = reader.nextString();
                     break;
                 case "description":
-                    subtask.setDescription(reader.nextString());
+                    description = reader.nextString();
                     break;
                 case "status":
-                    subtask.setStatus(Status.valueOf(reader.nextString().toUpperCase()));
+                   status = Status.valueOf(reader.nextString().toUpperCase());
                     break;
                 case "starttime":
                     if (!reader.peek().equals(JsonToken.NULL)) {
-                        subtask.setStartTime(Instant.ofEpochMilli(reader.nextLong()));
+                        startTime = Instant.ofEpochMilli(reader.nextLong());
                     } else {
                         reader.skipValue();
                     }
                     break;
                 case "duration":
                     if (!reader.peek().equals(JsonToken.NULL)) {
-                        subtask.setDuration(Duration.ofMillis(reader.nextLong()));
+                       duration = Duration.ofMillis(reader.nextLong());
                     } else {
                         reader.skipValue();
                     }
@@ -130,6 +135,7 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
                     reader.skipValue();
             }
         }
+        subtask = new Subtask(title, description, status, startTime, duration);
         reader.endObject();
         return subtask;
     }
