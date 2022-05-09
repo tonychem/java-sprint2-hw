@@ -82,19 +82,27 @@ public class Epic extends Task {
             newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.NEW, getMySubtasks(),
                     getStartTime(), getDuration());
             newEpicWithUpdatedStatus.setId(getId());
+            setThisEpicForSubtasks(newEpicWithUpdatedStatus);
             return newEpicWithUpdatedStatus;
         } else if (allDONE) {
             newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.DONE, getMySubtasks(),
                     getStartTime(), getDuration());
             newEpicWithUpdatedStatus.setId(getId());
+            setThisEpicForSubtasks(newEpicWithUpdatedStatus);
             return newEpicWithUpdatedStatus;
         }
 
         newEpicWithUpdatedStatus = new Epic(getTitle(), getDescription(), Status.IN_PROGRESS, getMySubtasks(),
                 getStartTime(), getDuration());
         newEpicWithUpdatedStatus.setId(getId());
-
+        setThisEpicForSubtasks(newEpicWithUpdatedStatus);
         return newEpicWithUpdatedStatus;
+    }
+
+    private void setThisEpicForSubtasks(Epic e) {
+        for (Subtask sub : e.getMySubtasks()) {
+            sub.setMyEpicReference(e);
+        }
     }
 
     @Override
@@ -130,6 +138,11 @@ public class Epic extends Task {
                 .filter(Objects::nonNull)
                 .max(Comparator.naturalOrder());
         return theLatestSubtaskInstant.orElse(null);
+    }
+
+    @Override
+    public void setStatus(Status s) {
+        //закрыт для записи
     }
 
     @Override

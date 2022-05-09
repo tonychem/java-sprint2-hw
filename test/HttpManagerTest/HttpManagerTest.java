@@ -36,13 +36,13 @@ public class HttpManagerTest {
     @BeforeAll
     public static void loadTasks() {
         task1 = new Task("task1", "task1");
-        epicEmpty = new Epic("epicEmpty", "test", new ArrayList<>());
+        epicEmpty = new Epic("epicEmpty", "test", new ArrayList<>()).update();
         subtask1 = new Subtask("Subtask1", "test", Status.IN_PROGRESS, Instant.EPOCH, Duration.ofSeconds(100));
         subtask2 = new Subtask("Subtask2", "test", Status.DONE, Instant.ofEpochSecond(120), Duration.ofSeconds(100));
         ArrayList<Subtask> subtasks = new ArrayList<>();
         subtasks.add(subtask1);
         subtasks.add(subtask2);
-        epicWithSubtasks = new Epic("epicWithSubtasks", "test", subtasks);
+        epicWithSubtasks = new Epic("epicWithSubtasks", "test", subtasks).update();
     }
 
     @BeforeEach
@@ -66,27 +66,42 @@ public class HttpManagerTest {
 
     @Test
     //TODO wont work
-    public void saveTaskTestNormal() throws IOException, InterruptedException {
+    public void saveAndRetrieveTaskTestNormal() throws IOException, InterruptedException {
         URI taskURI = URI.create("http://localhost:8080/tasks/task");
-        URI taskFromKVServer = URI.create("http://localhost:8078/load/" + "1" + "/?API_KEY=DEBUG");
+        URI epicURI = URI.create("http://localhost:8080/tasks/epic");
 
-        String task1json = JsonTask.writeTask(task1);
+        String task1Json = JsonTask.writeTask(task1);
+        String epicEmptyJson = JsonTask.writeEpic(epicEmpty);
+        String epicWithSubtasksJson = JsonTask.writeEpic(epicWithSubtasks);
+        String subtask1Json = JsonTask.writeSubtask(subtask1);
+        String subtask2Json = JsonTask.writeSubtask(subtask2);
 
-        HttpRequest requestToPublish = HttpRequest.newBuilder()
+        // id = 1
+        HttpRequest requestToPublishTask1Json = HttpRequest.newBuilder()
                 .uri(taskURI)
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(task1json))
+                .POST(HttpRequest.BodyPublishers.ofString(task1Json))
                 .build();
-        HttpRequest getRequestFromKVServer = HttpRequest.newBuilder()
-                .uri(taskFromKVServer)
+
+        // id = 2
+        HttpRequest requestToPublishEpicEmptyJson = HttpRequest.newBuilder()
+                .uri(epicURI)
                 .header("Content-Type", "application/json")
-                .GET()
+                .POST(HttpRequest.BodyPublishers.ofString(epicEmptyJson))
                 .build();
 
-        HttpResponse<String> responseFromHttp = httpClient.send(requestToPublish, HttpResponse.BodyHandlers.ofString());
-        HttpResponse<String> responseFromKV = httpClient.send(getRequestFromKVServer, HttpResponse.BodyHandlers.ofString());
-
-        Assertions.assertTrue(responseFromKV.body().equals(task1json));
+        // id = 3, 4, 5
+        HttpRequest requestToPublishEpicWithSubtasksJson = HttpRequest.newBuilder()
+                .uri(epicURI)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(epicWithSubtasksJson))
+                .build();
+        System.out.println(epicWithSubtasksJson);
+        JsonTask.readEpic(epicWithSubtasksJson);
+        // публикуем задания в HttpTaskManager-e
+        httpClient.send(requestToPublishTask1Json, HttpResponse.BodyHandlers.ofString());
+        httpClient.send(requestToPublishEpicEmptyJson, HttpResponse.BodyHandlers.ofString());
+        httpClient.send(requestToPublishEpicWithSubtasksJson, HttpResponse.BodyHandlers.ofString());
     }
 
 }

@@ -65,6 +65,10 @@ public class Task {
         return status;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     public Duration getDuration() {
         return duration;
     }

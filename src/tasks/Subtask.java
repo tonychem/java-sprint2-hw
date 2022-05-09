@@ -37,13 +37,6 @@ public class Subtask extends Task {
         return epicId;
     }
 
-    public Subtask setStatus(Status status) {
-        Subtask subtask = new Subtask(this.getTitle(), this.getDescription(), status);
-        subtask.setId(this.getId());
-        subtask.setMyEpicReference(this.getMyEpicReference());
-        return subtask;
-    }
-
     public TaskType getType() {
         return type;
     }
