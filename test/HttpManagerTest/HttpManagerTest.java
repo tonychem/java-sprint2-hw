@@ -103,7 +103,7 @@ public class HttpManagerTest {
         httpClient.send(requestToPublishEpicWithSubtasksJson, HttpResponse.BodyHandlers.ofString());
 
         // формируем несколько запросов на получение заданий
-        URI URIGetEpicWithSubtasks = URI.create("http://localhost:8078/load/" + "4" + "?API_KEY=DEBUG");
+        URI URIGetEpicWithSubtasks = URI.create("http://localhost:8078/load/" + "5" + "?API_KEY=DEBUG");
         HttpRequest requestToGetEpicWithSubtasksJson = HttpRequest.newBuilder()
                 .uri(URIGetEpicWithSubtasks)
                 .header("Content-Type", "application/json")
@@ -112,16 +112,12 @@ public class HttpManagerTest {
 
         HttpResponse<String> responseTask1 = httpClient.send(requestToGetEpicWithSubtasksJson,
                 HttpResponse.BodyHandlers.ofString());
-        System.out.println(epicWithSubtasksJson);
-        System.out.println(responseTask1.body());
 
         HttpRequest r = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/tasks"))
                 .GET()
                 .build();
         HttpResponse<String> allTasksResponseTest = httpClient.send(r, HttpResponse.BodyHandlers.ofString());
-        System.out.println(allTasksResponseTest.body());
-
 
         Assertions.assertTrue("epicWithSubtasks".equals(JsonTask.readEpic(responseTask1.body()).getTitle()));
     }

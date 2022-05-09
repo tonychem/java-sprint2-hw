@@ -107,6 +107,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             throw new IllegalArgumentException("попытка записать значение null");
         }
+
         if (!hasIntersection(epic)) {
             for (Subtask sub : epic.getMySubtasks()) {
                 if (!subtaskMap.containsValue(sub)) {
@@ -270,6 +271,14 @@ class TaskTemporalComparator implements Comparator<Task> {
         if (task1StartTime == null) {
             return 1;
         }
-        return task1StartTime.compareTo(task2StartTime);
+        // у сабтасков и эпиков совпадают startTime, поэтому epic не добавляется в TreeSet
+        int result;
+        if ((result = task1StartTime.compareTo(task2StartTime)) == 0) {
+            if (task1.getType() == TaskType.EPIC || task2.getType() == TaskType.EPIC) {
+                return -1; //epic будет первый элемент
+            }
+        }
+
+        return result;
     }
 }
