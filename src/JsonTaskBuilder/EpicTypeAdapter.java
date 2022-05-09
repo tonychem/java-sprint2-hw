@@ -2,6 +2,7 @@ package JsonTaskBuilder;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import tasks.Epic;
 import tasks.Status;
@@ -112,10 +113,18 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
                     subtask.setStatus(Status.valueOf(reader.nextString().toUpperCase()));
                     break;
                 case "starttime":
-                    subtask.setStartTime(Instant.ofEpochMilli(reader.nextLong()));
+                    if (!reader.peek().equals(JsonToken.NULL)) {
+                        subtask.setStartTime(Instant.ofEpochMilli(reader.nextLong()));
+                    } else {
+                        reader.skipValue();
+                    }
                     break;
                 case "duration":
-                    subtask.setDuration(Duration.ofMillis(reader.nextLong()));
+                    if (!reader.peek().equals(JsonToken.NULL)) {
+                        subtask.setDuration(Duration.ofMillis(reader.nextLong()));
+                    } else {
+                        reader.skipValue();
+                    }
                     break;
                 default:
                     reader.skipValue();
