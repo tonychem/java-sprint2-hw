@@ -36,9 +36,9 @@ public class TasksHandler implements HttpHandler {
                 if (t.getType() == TaskType.EPIC) {
                     os.write((JsonTask.writeEpic((Epic) t) + "\n").getBytes(CHARSET));
                 } else if ((t.getType() == TaskType.TASK)) {
-                    os.write((JsonTask.writeSubtask((Subtask) t) + "\n").getBytes(CHARSET));
-                } else {
                     os.write((JsonTask.writeTask(t) + "\n").getBytes(CHARSET));
+                } else {
+                    os.write((JsonTask.writeSubtask((Subtask) t) + "\n").getBytes(CHARSET));
                 }
             }
             os.close();
