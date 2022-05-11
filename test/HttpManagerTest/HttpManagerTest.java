@@ -65,7 +65,6 @@ public class HttpManagerTest {
     }
 
     @Test
-    //TODO wont work
     public void saveAndRetrieveTaskTestNormal() throws IOException, InterruptedException {
         URI taskURI = URI.create("http://localhost:8080/tasks/task");
         URI epicURI = URI.create("http://localhost:8080/tasks/epic");
